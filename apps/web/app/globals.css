@@ -1,0 +1,3 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, system-ui, -apple-system, sans-serif; background: #020617; }
+a { color: inherit; text-decoration: none; }
