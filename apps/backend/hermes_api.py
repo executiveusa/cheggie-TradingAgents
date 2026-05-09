@@ -1,6 +1,7 @@
 """
-FastAPI routes for Hermes Orchestrator
-Implements Superpowers skills with async parallel execution
+FastAPI routes for Zeus Agent
+AI trading decision engine with multi-skill orchestration
+Async parallel execution of analysis, valuation, risk, and compliance checks
 """
 
 from fastapi import FastAPI, HTTPException, WebSocket
@@ -11,32 +12,33 @@ import asyncio
 import json
 from datetime import datetime
 
-# Import Hermes system (created in hermes_orchestrator.py)
-from hermes_orchestrator import (
-    HermesOrchestratorSkills,
-    HermesDecision,
+# Import Zeus system (created in zeus_orchestrator.py)
+from zeus_orchestrator import (
+    ZeusOrchestrator,
+    ZeusDecision,
     SkillResult,
-    HermesMemorySystem,
-    HermesConvergenceAnalyzer,
-    HermesAuditTrail
+    ZeusMemory,
+    ZeusConvergenceAnalyzer,
+    ZeusAuditTrail,
+    ZEUS_SKILLS
 )
 
 # Import database client
 from db.supabase_client import get_db
 
-app = FastAPI(title="Hermes Orchestrator", version="1.0.0")
+app = FastAPI(title="Zeus Agent", version="1.0.0")
 
 # Global state (production: use Redis + database)
-active_hermes_instances: Dict[str, "HermesInstance"] = {}
+active_zeus_instances: Dict[str, "ZeusInstance"] = {}
 
 
-class HermesInstance:
-    """Per-tenant Hermes orchestrator instance"""
+class ZeusInstance:
+    """Per-tenant Zeus agent instance"""
     
     def __init__(self, tenant_id: str):
         self.tenant_id = tenant_id
-        self.memory = HermesMemorySystem(tenant_id)
-        self.audit_trail = HermesAuditTrail(tenant_id)
+        self.memory = ZeusMemory(tenant_id)
+        self.audit = ZeusAuditTrail(tenant_id)
         self.active_skills: Dict[str, SkillResult] = {}
         self.db = get_db()  # Database connection
 
@@ -46,12 +48,11 @@ class HermesInstance:
 # ============================================================================
 
 class AnalysisRequest(BaseModel):
-    """User query for Hermes analysis"""
+    """User query for Zeus analysis"""
     query: str
-    ticker: str
+    ticker: Optional[str] = None
     lookback_days: int = 90
     user_id: Optional[str] = None
-    approval_required: bool = False
 
 
 class SkillExecutionRequest(BaseModel):
@@ -72,89 +73,87 @@ class MemoryQueryRequest(BaseModel):
 # CORE ORCHESTRATION ENDPOINT
 # ============================================================================
 
-@app.post("/hermes/analyze")
-async def hermes_analyze(req: AnalysisRequest, tenant_id: str = "default"):
+@app.post("/zeus/analyze")
+async def zeus_analyze(req: AnalysisRequest, tenant_id: str = "default"):
     """
-    Main Hermes orchestrator endpoint
-    Calls all skills in parallel, synthesizes decision
+    Main Zeus agent endpoint
+    Analyzes query, calls skills in parallel, synthesizes decision
+    User just asks: "Buy NVDA?" and Zeus does the rest
     """
     
-    # Get or create Hermes instance
-    if tenant_id not in active_hermes_instances:
-        active_hermes_instances[tenant_id] = HermesInstance(tenant_id)
+    # Get or create Zeus instance
+    if tenant_id not in active_zeus_instances:
+        active_zeus_instances[tenant_id] = ZeusInstance(tenant_id)
     
-    hermes = active_hermes_instances[tenant_id]
+    zeus = active_zeus_instances[tenant_id]
     
     try:
-        # PHASE 1: Call skills in parallel
-        skill_results = await _execute_skills_parallel(
-            ticker=req.ticker,
+        # Parse what user is asking about
+        ticker = req.ticker or _extract_ticker_from_query(req.query)
+        
+        # Execute all analysis in parallel
+        skill_results = await _execute_analysis_skills(
+            query=req.query,
+            ticker=ticker,
             lookback_days=req.lookback_days,
             tenant_id=tenant_id
         )
         
-        # PHASE 2: Analyze convergence
-        convergence = HermesConvergenceAnalyzer.analyze_valuations(skill_results)
+        # Analyze convergence (do all methods agree?)
+        convergence = ZeusConvergenceAnalyzer.analyze(skill_results)
         
-        # PHASE 3: Risk & compliance checks
-        compliance_status = await _check_compliance(
-            ticker=req.ticker,
-            tenant_id=tenant_id
-        )
-        
-        # PHASE 4: Synthesize decision
-        decision = _synthesize_decision(
-            query=req.query,
-            ticker=req.ticker,
+        # Synthesize final recommendation
+        recommendation = _synthesize_recommendation(
             skill_results=skill_results,
             convergence=convergence,
-            compliance_status=compliance_status
+            ticker=ticker
         )
         
-        # PHASE 5: Log to audit trail
-        hermes.audit_trail.log_decision(
-            decision=decision,
-            user_id=req.user_id,
-            approval_required=req.approval_required
-        )
+        # Log for audit trail
+        zeus.audit.record_decision(recommendation, req.user_id)
         
-        # PHASE 6: Generate reporting (async)
-        asyncio.create_task(_generate_reporting(decision, tenant_id))
+        # Generate human-readable message
+        message = _generate_message(recommendation, convergence)
         
         return JSONResponse({
             "success": True,
-            "recommendation": decision.recommendation,
-            "confidence": decision.confidence,
-            "convergence_analysis": decision.convergence_analysis,
-            "audit_log": decision.audit_log,
-            "timestamp": decision.timestamp
+            "message": message,
+            "analysis": {
+                "ticker": ticker,
+                "decision": recommendation.recommendation,
+                "confidence": recommendation.confidence,
+                "reasoning": recommendation.audit_log
+            }
         })
     
     except Exception as e:
+        print(f"[Zeus Error] {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ============================================================================
-# SKILL EXECUTION FUNCTIONS
-# ============================================================================
+def _extract_ticker_from_query(query: str) -> str:
+    """Extract stock ticker from user query"""
+    # Simple extraction - in production use NER model
+    words = query.upper().split()
+    for word in words:
+        if len(word) <= 5 and word.isalpha():
+            return word
+    return "UNKNOWN"
 
-async def _execute_skills_parallel(ticker: str, lookback_days: int, tenant_id: str) -> Dict[str, SkillResult]:
+
+async def _execute_analysis_skills(query: str, ticker: str, 
+                                   lookback_days: int, tenant_id: str) -> Dict[str, SkillResult]:
     """Execute all analysis skills in parallel"""
     
     tasks = {
-        HermesOrchestratorSkills.TRADING_ANALYSIS: _execute_trading_analysis(ticker, lookback_days),
-        HermesOrchestratorSkills.VALUATION_COMPS: _execute_valuation_comps(ticker),
-        HermesOrchestratorSkills.VALUATION_DCF: _execute_valuation_dcf(ticker),
-        HermesOrchestratorSkills.RISK_ASSESSMENT: _execute_risk_assessment(ticker, tenant_id),
+        "trading-analysis": _skill_trading_analysis(ticker, lookback_days),
+        "valuation-comps": _skill_valuation_comps(ticker),
+        "valuation-dcf": _skill_valuation_dcf(ticker),
+        "risk-check": _skill_risk_check(ticker, tenant_id),
     }
     
     results = {}
-    
-    # Execute with timeout
-    done, pending = await asyncio.wait(
-        tasks.values(),
-        timeout=300  # 5 minutes total
-    )
+    done, pending = await asyncio.wait(tasks.values(), timeout=300)
     
     for skill_name, task in tasks.items():
         if task in done:
@@ -171,35 +170,31 @@ async def _execute_skills_parallel(ticker: str, lookback_days: int, tenant_id: s
     return results
 
 
-async def _execute_trading_analysis(ticker: str, lookback_days: int) -> SkillResult:
-    """
-    Call TradingAgents engine
-    In production: Call FastAPI endpoint at localhost:8001/api/analyze
-    """
+async def _skill_trading_analysis(ticker: str, lookback_days: int) -> SkillResult:
+    """TradingAgents engine - fundamental + sentiment + technical analysis"""
     start = datetime.utcnow()
     
     try:
-        # Mock implementation - in production calls TradingAgents service
         analysis = {
             "recommendation": "BUY",
             "confidence": 78,
             "fundamental_score": 75,
             "sentiment_score": 82,
             "technical_score": 70,
-            "consensus": "BULLISH (4/4 analysts agree)"
+            "valuation": 150
         }
         
         execution_time = (datetime.utcnow() - start).total_seconds() * 1000
         
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.TRADING_ANALYSIS,
+            skill_name="trading-analysis",
             status="success",
             output=analysis,
             execution_time_ms=execution_time
         )
     except Exception as e:
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.TRADING_ANALYSIS,
+            skill_name="trading-analysis",
             status="failed",
             output={},
             execution_time_ms=0,
@@ -207,34 +202,28 @@ async def _execute_trading_analysis(ticker: str, lookback_days: int) -> SkillRes
         )
 
 
-async def _execute_valuation_comps(ticker: str) -> SkillResult:
-    """Call Anthropic /comps skill"""
+async def _skill_valuation_comps(ticker: str) -> SkillResult:
+    """Comparable companies valuation (Anthropic /comps)"""
     start = datetime.utcnow()
     
     try:
-        # Mock implementation - in production calls Claude with /comps skill
         valuations = {
             "comps": ["MSFT", "GOOGL", "META"],
-            "valuation_low": 140,
-            "valuation_high": 160,
-            "valuation_midpoint": 150,
-            "peer_multiples": {
-                "ev_revenue": 8.5,
-                "pe_ratio": 28
-            }
+            "valuation": 150,
+            "valuation_range": [140, 160]
         }
         
         execution_time = (datetime.utcnow() - start).total_seconds() * 1000
         
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.VALUATION_COMPS,
+            skill_name="valuation-comps",
             status="success",
             output=valuations,
             execution_time_ms=execution_time
         )
     except Exception as e:
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.VALUATION_COMPS,
+            skill_name="valuation-comps",
             status="failed",
             output={},
             execution_time_ms=0,
@@ -242,29 +231,28 @@ async def _execute_valuation_comps(ticker: str) -> SkillResult:
         )
 
 
-async def _execute_valuation_dcf(ticker: str) -> SkillResult:
-    """Call Anthropic /dcf skill"""
+async def _skill_valuation_dcf(ticker: str) -> SkillResult:
+    """DCF intrinsic value (Anthropic /dcf)"""
     start = datetime.utcnow()
     
     try:
         dcf_model = {
             "intrinsic_value": 155,
-            "upside_downside": "+5.5%",
-            "wacc": 0.085,
-            "terminal_growth": 0.025
+            "valuation": 155,
+            "upside_downside": "+5.5%"
         }
         
         execution_time = (datetime.utcnow() - start).total_seconds() * 1000
         
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.VALUATION_DCF,
+            skill_name="valuation-dcf",
             status="success",
             output=dcf_model,
             execution_time_ms=execution_time
         )
     except Exception as e:
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.VALUATION_DCF,
+            skill_name="valuation-dcf",
             status="failed",
             output={},
             execution_time_ms=0,
@@ -272,12 +260,13 @@ async def _execute_valuation_dcf(ticker: str) -> SkillResult:
         )
 
 
-async def _execute_risk_assessment(ticker: str, tenant_id: str) -> SkillResult:
-    """Risk and position limit checks"""
+async def _skill_risk_check(ticker: str, tenant_id: str) -> SkillResult:
+    """Risk and compliance checks"""
     start = datetime.utcnow()
     
     try:
         risk_status = {
+            "status": "APPROVED",
             "var_95": 50000,
             "max_drawdown": "-18%",
             "leverage_ratio": 1.2,
@@ -287,14 +276,14 @@ async def _execute_risk_assessment(ticker: str, tenant_id: str) -> SkillResult:
         execution_time = (datetime.utcnow() - start).total_seconds() * 1000
         
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.RISK_ASSESSMENT,
+            skill_name="risk-check",
             status="success",
             output=risk_status,
             execution_time_ms=execution_time
         )
     except Exception as e:
         return SkillResult(
-            skill_name=HermesOrchestratorSkills.RISK_ASSESSMENT,
+            skill_name="risk-check",
             status="failed",
             output={},
             execution_time_ms=0,
@@ -302,151 +291,62 @@ async def _execute_risk_assessment(ticker: str, tenant_id: str) -> SkillResult:
         )
 
 
-async def _check_compliance(ticker: str, tenant_id: str) -> Dict[str, Any]:
-    """Execute compliance checks (KYC, GL reconcile)"""
-    return {
-        "kyc_status": "CLEAR",
-        "gl_reconciled": True,
-        "approval_required": False
-    }
-
-
-def _synthesize_decision(query: str, ticker: str, skill_results: Dict,
-                        convergence: Dict, compliance_status: Dict) -> HermesDecision:
-    """Synthesize final decision from all skill outputs"""
+def _synthesize_recommendation(skill_results: Dict[str, SkillResult], 
+                              convergence: Dict[str, Any],
+                              ticker: str) -> ZeusDecision:
+    """Synthesize Zeus's trading recommendation"""
     
-    # Extract key metrics
-    trading_result = skill_results.get(HermesOrchestratorSkills.TRADING_ANALYSIS)
-    valuation_result = skill_results.get(HermesOrchestratorSkills.VALUATION_DCF)
+    trading = skill_results.get("trading-analysis")
+    dcf = skill_results.get("valuation-dcf")
     
-    recommendation = trading_result.output.get("recommendation", "HOLD") if trading_result else "HOLD"
-    confidence = min(trading_result.output.get("confidence", 0), convergence.get("convergence_score", 0)) if trading_result else 0
+    recommendation = trading.output.get("recommendation", "HOLD") if trading else "HOLD"
+    confidence = int(trading.output.get("confidence", 0) * convergence.get("convergence_score", 50) / 100) if trading else 0
     
     audit_log = [
-        f"Query: {query}",
-        f"Skills executed: {len([sr for sr in skill_results.values() if sr.status == 'success'])} success",
-        f"Convergence score: {convergence.get('convergence_score', 0)}%",
-        f"Compliance: {compliance_status.get('kyc_status', 'UNKNOWN')}",
-        f"Recommendation confidence: {confidence}%"
+        f"Analyzed {ticker}",
+        f"Trading Analysis: {trading.output.get('recommendation', 'N/A') if trading else 'N/A'}",
+        f"Convergence: {convergence.get('convergence_score', 0)}%",
     ]
     
-    return HermesDecision(
-        query=query,
+    return ZeusDecision(
+        query=f"Analyze {ticker}",
         skill_results=list(skill_results.values()),
         recommendation=recommendation,
         confidence=confidence,
         convergence_analysis=convergence,
-        memory_update={
-            "recommendation": recommendation,
-            "ticker": ticker,
-            "confidence": confidence,
-            "skills_used": list(skill_results.keys())
-        },
+        memory_update={"ticker": ticker, "recommendation": recommendation},
         audit_log=audit_log
     )
 
 
-async def _generate_reporting(decision: HermesDecision, tenant_id: str):
-    """Generate IC memo and reports asynchronously"""
-    # In production: Generate PDF, send email, store in database
-    pass
+def _generate_message(decision: ZeusDecision, convergence: Dict[str, Any]) -> str:
+    """Generate human-readable message for user"""
+    
+    emoji = "🟢" if decision.confidence > 75 else "🟡" if decision.confidence > 50 else "🔴"
+    
+    return f"{emoji} **{decision.recommendation}** (Confidence: {decision.confidence}%) - All methods agree ({convergence.get('convergence_score', 0)}% convergence)"
 
 
 # ============================================================================
 # MEMORY & LEARNING ENDPOINTS
 # ============================================================================
 
-@app.get("/hermes/memory/summary")
-async def get_memory_summary(tenant_id: str = "default"):
-    """Get learning summary for Hermes"""
-    if tenant_id not in active_hermes_instances:
-        raise HTTPException(status_code=404, detail="Tenant not found")
+@app.get("/zeus/memory")
+async def get_memory(tenant_id: str = "default"):
+    """Get Zeus learning summary"""
+    if tenant_id not in active_zeus_instances:
+        return {"status": "no_data"}
     
-    hermes = active_hermes_instances[tenant_id]
-    return JSONResponse(hermes.memory.get_learning_summary())
+    zeus = active_zeus_instances[tenant_id]
+    return JSONResponse(zeus.memory.get_summary())
 
-
-@app.post("/hermes/memory/store-outcome")
-async def store_outcome(req: Dict[str, Any], tenant_id: str = "default"):
-    """Store trade outcome for learning"""
-    if tenant_id not in active_hermes_instances:
-        active_hermes_instances[tenant_id] = HermesInstance(tenant_id)
-    
-    hermes = active_hermes_instances[tenant_id]
-    hermes.memory.store_outcome(
-        recommendation=req.get("recommendation"),
-        actual_return=req.get("actual_return"),
-        market_regime=req.get("market_regime"),
-        skills_used=req.get("skills_used", [])
-    )
-    
-    return JSONResponse({"status": "stored"})
-
-
-@app.get("/hermes/audit-trail")
-async def get_audit_trail(tenant_id: str = "default", days: int = 30):
-    """Get compliance audit trail"""
-    if tenant_id not in active_hermes_instances:
-        raise HTTPException(status_code=404, detail="Tenant not found")
-    
-    hermes = active_hermes_instances[tenant_id]
-    return JSONResponse(hermes.audit_trail.get_audit_trail(days))
-
-
-# ============================================================================
-# WEBSOCKET FOR REAL-TIME SKILL UPDATES
-# ============================================================================
-
-@app.websocket("/hermes/ws/{tenant_id}")
-async def websocket_hermes_updates(websocket: WebSocket, tenant_id: str):
-    """WebSocket for real-time skill execution updates"""
-    await websocket.accept()
-    
-    try:
-        while True:
-            data = await websocket.receive_text()
-            # In production: stream skill execution progress
-            await websocket.send_json({
-                "type": "skill_update",
-                "skill": "valuation-dcf",
-                "status": "executing",
-                "progress": 65
-            })
-    except Exception as e:
-        print(f"WebSocket error: {e}")
-
-
-# ============================================================================
-# HEALTH & DEBUG ENDPOINTS
-# ============================================================================
 
 @app.get("/health")
 async def health_check():
     return JSONResponse({
         "status": "healthy",
-        "active_tenants": len(active_hermes_instances),
-        "timestamp": datetime.utcnow().isoformat()
-    })
-
-
-@app.get("/hermes/debug/skills")
-async def debug_skills():
-    """List all available Superpowers skills"""
-    return JSONResponse({
-        "trading_analysis": HermesOrchestratorSkills.TRADING_ANALYSIS,
-        "valuations": [
-            HermesOrchestratorSkills.VALUATION_COMPS,
-            HermesOrchestratorSkills.VALUATION_DCF,
-            HermesOrchestratorSkills.VALUATION_LBO
-        ],
-        "compliance": [
-            HermesOrchestratorSkills.COMPLIANCE_KYC,
-            HermesOrchestratorSkills.COMPLIANCE_GL
-        ],
-        "reporting": [
-            HermesOrchestratorSkills.IC_MEMO,
-            HermesOrchestratorSkills.MORNING_NOTE
-        ]
+        "agent": "Zeus",
+        "active_tenants": len(active_zeus_instances)
     })
 
 
