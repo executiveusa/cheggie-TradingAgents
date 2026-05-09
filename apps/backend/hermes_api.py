@@ -21,6 +21,9 @@ from hermes_orchestrator import (
     HermesAuditTrail
 )
 
+# Import database client
+from db.supabase_client import get_db
+
 app = FastAPI(title="Hermes Orchestrator", version="1.0.0")
 
 # Global state (production: use Redis + database)
@@ -35,6 +38,7 @@ class HermesInstance:
         self.memory = HermesMemorySystem(tenant_id)
         self.audit_trail = HermesAuditTrail(tenant_id)
         self.active_skills: Dict[str, SkillResult] = {}
+        self.db = get_db()  # Database connection
 
 
 # ============================================================================
