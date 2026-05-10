@@ -1,0 +1,31 @@
+server:
+  name: zeus-chrome-devtools-mcp
+  description: "Chrome DevTools integration for ZEUS reasoning visibility"
+  version: 1.0
+
+capabilities:
+  - name: "console_monitoring"
+    description: "Capture console logs from ZEUS reasoning"
+    method: "cdtp.console.read"
+
+  - name: "performance_profiling"
+    description: "Monitor ZEUS response latency by provider"
+    method: "cdtp.performance.profile"
+
+  - name: "network_inspection"
+    description: "Track API calls to model providers"
+    method: "cdtp.network.capture"
+
+  - name: "token_tracking"
+    description: "Monitor token spend per request"
+    method: "cdtp.memory.tokenCount"
+
+  - name: "error_debugging"
+    description: "Capture stack traces when providers fail"
+    method: "cdtp.debugging.stackTrace"
+
+safety_rules:
+  - admin_only_access: true
+  - read_only_on_live_trading: true
+  - all_sessions_logged: true
+  - fallback_without_tools: true
