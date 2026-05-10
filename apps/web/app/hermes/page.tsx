@@ -6,8 +6,9 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
 
 interface Message {
   id: string;
@@ -45,7 +46,7 @@ const TENANT_THEMES: Record<string, TenantTheme> = {
   }
 };
 
-export default function ZeusWhiteLabel() {
+function ZeusWhiteLabelContent() {
   const searchParams = useSearchParams();
   const tenantId = searchParams.get('tenant') || 'aleksa';
   const theme = TENANT_THEMES[tenantId] || TENANT_THEMES['aleksa'];
@@ -261,5 +262,13 @@ export default function ZeusWhiteLabel() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ZeusWhiteLabel() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-900">Loading...</div>}>
+      <ZeusWhiteLabelContent />
+    </Suspense>
   );
 }

@@ -18,6 +18,9 @@ interface Message {
     decision?: string;
     confidence?: number;
     reasoning?: string;
+    risks?: string[];
+    nextSteps?: string[];
+    valuations?: Record<string, number>;
   };
 }
 
