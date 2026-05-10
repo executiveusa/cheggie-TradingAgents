@@ -1,4 +1,4 @@
-# Hermes Orchestrator: Complete System Summary
+# Zeus Orchestrator: Complete System Summary
 
 ## The Vision (What Aleksa Now Has)
 
@@ -9,7 +9,7 @@ A **financial decision engine that learns, scales, and makes money** - transform
 ## What We Built (2,881 Lines of Code)
 
 ### 🎯 Backend Orchestrator (Python/FastAPI)
-**File:** `apps/backend/hermes_orchestrator.py` (348 lines)
+**File:** `apps/backend/zeus_orchestrator.py` (348 lines)
 
 ```python
 class HermesOrchestratorSkills:
@@ -30,7 +30,7 @@ class HermesOrchestratorSkills:
 - `HermesAuditTrail` - SEC-grade compliance logging
 
 ### 🔌 API Routes (FastAPI)
-**File:** `apps/backend/hermes_api.py` (452 lines)
+**File:** `apps/backend/zeus_api.py` (452 lines)
 
 **Main Endpoint:**
 ```
@@ -122,7 +122,7 @@ results = await asyncio.gather(
 ```
 
 ### 3. Systematic Debugging
-When Hermes recommendation is wrong, follow Superpowers 4-phase process:
+When Zeus recommendation is wrong, follow Superpowers 4-phase process:
 ```
 Phase 1: What happened?
   → Load decision from audit trail
@@ -138,7 +138,7 @@ Phase 3: Defense-in-depth
 
 Phase 4: Condition-based waiting
   → Did market regime change?
-  → Should Hermes adapt learning?
+  → Should Zeus adapt learning?
 ```
 
 ### 4. Code Review Before Merge (Superpowers Skill)
@@ -170,7 +170,7 @@ Each skill implementation reviewed against:
 
 ### Tier 1: Platform Licensing
 - **Price:** $5k-50k/month per tenant
-- **Includes:** Hermes orchestrator, 5 white-label seats, basic support
+- **Includes:** Zeus orchestrator, 5 white-label seats, basic support
 - **Customer:** Hedge funds, RIAs, prop trading shops
 
 ### Tier 2: Premium Features
@@ -180,7 +180,7 @@ Each skill implementation reviewed against:
 - **Advanced analytics:** +$5k/mo
 
 ### Tier 3: Skills Marketplace
-- Hermes discovers new trading patterns
+- Zeus discovers new trading patterns
 - Pattern becomes a "skill" (like `/bullish-divergence-detector`)
 - Other traders license it
 - **Revenue split:** Aleksa 70%, Creator 30%
@@ -235,7 +235,7 @@ Every decision logged: WHO → WHEN → WHAT → WHY → ACTUAL RESULT
 Outcome tracked → Regime detection triggered → Memory updated → Next signal improved
 
 ### ✅ Multi-Tenant Isolation
-Each tenant = isolated Hermes instance + separate memory + separate audit
+Each tenant = isolated Zeus instance + separate memory + separate audit
 
 ### ✅ Compliance Ready
 IC memo auto-generated, audit trail for SEC, trade reconciliation with GL
@@ -246,9 +246,9 @@ IC memo auto-generated, audit trail for SEC, trade reconciliation with GL
 
 ```
 Backend
-├── apps/backend/hermes_orchestrator.py          348 lines ⭐
-├── apps/backend/hermes_api.py                   452 lines ⭐
-└── apps/backend/HERMES_SKILLS_MANIFEST.md       283 lines 📋
+├── apps/backend/zeus_orchestrator.py          348 lines ⭐
+├── apps/backend/zeus_api.py                   452 lines ⭐
+└── apps/backend/ZEUS_SKILLS_MANIFEST.md       283 lines 📋
 
 Frontend  
 ├── apps/web/app/aleksa/page.tsx                 387 lines ⭐
@@ -275,7 +275,7 @@ Deployment: Ready for Vercel + Railway
 # Terminal 1: Backend
 cd apps/backend
 pip install fastapi uvicorn pydantic
-python hermes_api.py
+python zeus_api.py
 # → http://localhost:8000
 
 # Terminal 2: Frontend
@@ -306,7 +306,7 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 ✅ 100% audit trail compliance
 ✅ MRR reached $50k (5+ customers)
 ✅ Skills marketplace generating $5k/mo
-✅ Hermes autonomously discovered 3+ new trading patterns
+✅ Zeus autonomously discovered 3+ new trading patterns
 
 ---
 
@@ -330,7 +330,7 @@ The difference: **From art to commerce. From tool to business.**
 ## Questions This Answers For Aleksa
 
 **"How do I make money from TradingAgents?"**
-→ Hermes orchestrator + white-label = $5k-50k/mo per customer
+→ Zeus orchestrator + white-label = $5k-50k/mo per customer
 
 **"How do I scale beyond 1 user?"**
 → Multi-tenant dashboard + isolated memory per tenant

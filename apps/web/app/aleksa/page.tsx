@@ -1,385 +1,257 @@
 /**
- * Aleksa's Hermes Master Dashboard
- * Private orchestration console with Emerald Tablet design
- * Shows convergence of all analysis methods in real-time
+ * Zeus Agent - Aleksa's AI Trading Command Center
+ * Chat interface to control Zeus - the autonomous trading decision engine
+ * Ask Zeus anything. It analyzes, decides, and executes.
  */
 
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 
-// Emerald Tablet Design Tokens
-const EMERALD_DESIGN = {
-  colors: {
-    primary: '#10b981',      // Emerald
-    secondary: '#1e293b',    // Deep slate
-    accent: '#f59e0b',       // Gold
-    success: '#22c55e',      // Green
-    warning: '#ef4444',      // Red
-    neutral: '#f8fafc'       // Off-white
-  },
-  fonts: {
-    heading: "'Inter', sans-serif",
-    body: "'Inter', sans-serif",
-    mono: "'Fira Code', monospace"
-  }
-};
-
-interface SkillResult {
-  skill_name: string;
-  status: 'success' | 'pending' | 'failed';
-  output: Record<string, any>;
-  execution_time_ms: number;
-  error?: string;
+interface Message {
+  id: string;
+  role: 'user' | 'zeus';
+  content: string;
+  timestamp: Date;
+  analysis?: {
+    ticker?: string;
+    decision?: string;
+    confidence?: number;
+    reasoning?: string;
+  };
 }
 
-interface HermesDecision {
+interface ZeusAnalysis {
   recommendation: string;
   confidence: number;
-  convergence_analysis: {
-    convergence_score: number;
-    valuations: Record<string, any>;
-    all_methods_agree: boolean;
-  };
-  audit_log: string[];
-  skill_results: SkillResult[];
+  reasoning: string;
+  valuations: Record<string, number>;
+  risks: string[];
+  nextSteps: string[];
 }
 
-export default function AleksaHermesDashboard() {
-  const [selectedTicker, setSelectedTicker] = useState('NVDA');
-  const [decision, setDecision] = useState<HermesDecision | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('convergence');
-  const wsRef = useRef<WebSocket | null>(null);
+const ZEUS_SYSTEM_MESSAGE = `You are Zeus, an autonomous trading agent. You analyze stocks, identify opportunities, and make trading decisions.
+When users ask about stocks, provide:
+1. Clear recommendation (BUY/SELL/HOLD)
+2. Confidence level (0-100)
+3. Why you're recommending it
+4. Key risks
+5. What to do next
 
-  // Connect to WebSocket for real-time skill updates
+Keep responses concise and actionable.`;
+
+export default function ZeusCommandCenter() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'zeus',
+      content: "I'm Zeus. Ask me about any stock and I'll analyze it, compare valuations, assess risk, and tell you exactly what to do.",
+      timestamp: new Date()
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   useEffect(() => {
-    const tenantId = 'aleksa';
-    wsRef.current = new WebSocket(`ws://localhost:8000/hermes/ws/${tenantId}`);
-    
-    wsRef.current.onmessage = (event) => {
-      const update = JSON.parse(event.data);
-      // Handle skill progress updates
-      console.log('[Hermes WebSocket]', update);
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input,
+      timestamp: new Date()
     };
 
-    return () => wsRef.current?.close();
-  }, []);
-
-  // Fetch analysis from Hermes
-  const analyzeStock = async () => {
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
     setLoading(true);
+
     try {
-      const response = await fetch('http://localhost:8000/hermes/analyze?tenant_id=aleksa', {
+      // Call Zeus API
+      const response = await fetch('http://localhost:8000/zeus/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: `Analyze ${selectedTicker} for trading signal`,
-          ticker: selectedTicker,
-          lookback_days: 90,
+          query: input,
+          tenant_id: 'aleksa',
           user_id: 'aleksa'
         })
       });
 
       const data = await response.json();
-      if (data.success) {
-        setDecision(data as HermesDecision);
-      }
+
+      const zeusMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'zeus',
+        content: data.message || 'Analysis complete',
+        timestamp: new Date(),
+        analysis: data.analysis
+      };
+
+      setMessages(prev => [...prev, zeusMessage]);
     } catch (error) {
-      console.error('[Hermes Error]', error);
+      console.error('[Zeus Error]', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'zeus',
+        content: 'Connection error. Try again in a moment.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ background: EMERALD_DESIGN.colors.neutral }} className="min-h-screen p-8">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Header */}
-        <header className="mb-8">
-          <div className="flex justify-between items-center mb-4">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <header className="bg-slate-950 border-b border-emerald-500/30 px-6 py-4 shadow-lg">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">⚡</span>
+            </div>
             <div>
-              <h1 style={{ color: EMERALD_DESIGN.colors.secondary, fontFamily: EMERALD_DESIGN.fonts.heading }} 
-                  className="text-3xl font-bold">
-                ⟐ Hermes Master Dashboard
-              </h1>
-              <p className="text-slate-600 mt-1">Aleksa's Private Orchestration Console</p>
-            </div>
-            <div style={{ background: EMERALD_DESIGN.colors.primary }} className="rounded-lg px-4 py-2 text-white text-sm">
-              Live • Connected to 4 Skill Engines
+              <h1 className="text-xl font-bold text-white">Zeus Agent</h1>
+              <p className="text-sm text-emerald-400">AI Trading Decision Engine</p>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Control Panel */}
-        <section style={{ background: 'white', borderColor: EMERALD_DESIGN.colors.primary }} 
-                 className="rounded-xl border-2 p-6 mb-6 shadow-md">
-          <div className="flex gap-4 items-end">
-            <div>
-              <label className="block text-sm font-semibold mb-2">Select Ticker</label>
-              <input
-                type="text"
-                value={selectedTicker}
-                onChange={(e) => setSelectedTicker(e.target.value.toUpperCase())}
-                style={{ borderColor: EMERALD_DESIGN.colors.primary }}
-                className="border-2 rounded-lg px-4 py-2 font-mono text-lg w-32"
-                placeholder="NVDA"
-              />
-            </div>
-            <button
-              onClick={analyzeStock}
-              disabled={loading}
-              style={{ 
-                background: EMERALD_DESIGN.colors.primary,
-                opacity: loading ? 0.6 : 1
-              }}
-              className="text-white font-semibold px-6 py-2 rounded-lg disabled:cursor-not-allowed transition-opacity"
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {messages.map(msg => (
+            <div
+              key={msg.id}
+              className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {loading ? 'Analyzing...' : 'Analyze'}
-            </button>
-          </div>
-        </section>
-
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 border-b-2" style={{ borderColor: EMERALD_DESIGN.colors.secondary }}>
-          {['convergence', 'skills', 'memory', 'compliance'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                color: activeTab === tab ? EMERALD_DESIGN.colors.primary : '#64748b',
-                borderBottom: activeTab === tab ? `3px solid ${EMERALD_DESIGN.colors.primary}` : 'none'
-              }}
-              className="px-4 py-3 font-semibold capitalize transition-colors"
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Content Panels */}
-        {decision && (
-          <>
-            {/* TAB 1: CONVERGENCE ANALYSIS */}
-            {activeTab === 'convergence' && <ConvergencePanel decision={decision} />}
-
-            {/* TAB 2: SKILL RESULTS */}
-            {activeTab === 'skills' && <SkillsPanel decision={decision} />}
-
-            {/* TAB 3: LEARNING MEMORY */}
-            {activeTab === 'memory' && <MemoryPanel />}
-
-            {/* TAB 4: COMPLIANCE & AUDIT */}
-            {activeTab === 'compliance' && <CompliancePanel decision={decision} />}
-          </>
-        )}
-
-        {!decision && !loading && (
-          <div className="text-center py-16">
-            <p style={{ color: EMERALD_DESIGN.colors.secondary }} className="text-lg font-semibold mb-4">
-              Select a ticker and click Analyze to begin orchestration
-            </p>
-            <p className="text-slate-500">Hermes will call all skills in parallel and synthesize a decision</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Panel 1: Convergence Analysis
- * Shows how all valuation methods agree or diverge
- */
-function ConvergencePanel({ decision }: { decision: HermesDecision }) {
-  const convergence = decision.convergence_analysis;
-
-  return (
-    <div className="space-y-6">
-      {/* Main Recommendation Card */}
-      <div 
-        style={{
-          background: decision.recommendation === 'BUY' ? '#dcfce7' : '#fee2e2',
-          borderColor: decision.recommendation === 'BUY' ? '#22c55e' : '#ef4444'
-        }}
-        className="border-2 rounded-xl p-8 shadow-lg"
-      >
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <p className="text-sm font-semibold text-slate-600 mb-2">HERMES DECISION</p>
-            <h2 style={{ color: decision.recommendation === 'BUY' ? '#16a34a' : '#dc2626' }} 
-                className="text-4xl font-bold">
-              {decision.recommendation}
-            </h2>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-slate-600 mb-2">Confidence</p>
-            <p className="text-3xl font-bold" style={{ color: '#f59e0b' }}>
-              {decision.confidence}%
-            </p>
-          </div>
-        </div>
-        <div className="text-slate-700 font-semibold">
-          All {Object.keys(convergence.valuations).length} valuation methods agree: {convergence.all_methods_agree ? '✓ YES' : '✗ NO'}
-        </div>
-      </div>
-
-      {/* Convergence Gauge */}
-      <div style={{ background: 'white', borderColor: '#e2e8f0' }} className="border-2 rounded-xl p-6 shadow-md">
-        <h3 className="text-lg font-bold mb-4">Convergence Score</h3>
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <div style={{ background: '#e2e8f0' }} className="h-8 rounded-full overflow-hidden">
+              {msg.role === 'zeus' && (
+                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-sm">⚡</span>
+                </div>
+              )}
+              
               <div
-                style={{ 
-                  width: `${convergence.convergence_score}%`,
-                  background: convergence.convergence_score > 75 ? '#22c55e' : 
-                             convergence.convergence_score > 50 ? '#f59e0b' : '#ef4444'
-                }}
-                className="h-full transition-all duration-500"
-              />
-            </div>
-          </div>
-          <span className="text-2xl font-bold" style={{ color: '#f59e0b' }}>
-            {convergence.convergence_score.toFixed(0)}%
-          </span>
-        </div>
-        <p className="text-sm text-slate-600 mt-3">
-          {convergence.convergence_score > 75 ? '✓ Strong consensus across methods' :
-           convergence.convergence_score > 50 ? '◐ Moderate agreement' :
-           '✗ Methods diverge - caution advised'}
-        </p>
-      </div>
+                className={`max-w-2xl px-4 py-3 rounded-lg ${
+                  msg.role === 'user'
+                    ? 'bg-emerald-600 text-white rounded-br-none'
+                    : 'bg-slate-700 text-slate-100 rounded-bl-none'
+                }`}
+              >
+                <p className="text-sm">{msg.content}</p>
+                
+                {msg.analysis && (
+                  <div className="mt-3 pt-3 border-t border-slate-600 space-y-2">
+                    {msg.analysis.confidence !== undefined && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-300">Confidence</span>
+                        <div className="w-24 h-2 bg-slate-600 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-400"
+                            style={{ width: `${msg.analysis.confidence}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {msg.analysis.risks && msg.analysis.risks.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-red-400">Risks:</p>
+                        <ul className="text-xs text-slate-300 list-disc list-inside">
+                          {msg.analysis.risks.slice(0, 2).map((risk, i) => (
+                            <li key={i}>{risk}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <p className="text-xs text-slate-400 mt-2">
+                  {msg.timestamp.toLocaleTimeString()}
+                </p>
+              </div>
 
-      {/* Valuation Methods Comparison */}
-      <div style={{ background: 'white', borderColor: '#e2e8f0' }} className="border-2 rounded-xl p-6 shadow-md">
-        <h3 className="text-lg font-bold mb-4">Valuation Methods</h3>
-        <div className="space-y-3">
-          {Object.entries(convergence.valuations).map(([method, data]: [string, any]) => (
-            <div key={method} className="flex justify-between items-center p-3 rounded-lg" style={{ background: '#f1f5f9' }}>
-              <span className="font-semibold capitalize">{method}</span>
-              <span style={{ color: '#10b981' }} className="font-bold">
-                ${data.midpoint || data.intrinsic_value || data.transaction_value || '—'}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Panel 2: Individual Skill Results
- * Shows execution status and output from each skill
- */
-function SkillsPanel({ decision }: { decision: HermesDecision }) {
-  return (
-    <div className="grid gap-4">
-      {decision.skill_results.map((skill) => (
-        <div 
-          key={skill.skill_name}
-          style={{
-            background: 'white',
-            borderColor: skill.status === 'success' ? '#22c55e' : 
-                        skill.status === 'pending' ? '#f59e0b' : '#ef4444'
-          }}
-          className="border-2 rounded-lg p-4 shadow-sm"
-        >
-          <div className="flex justify-between items-start mb-3">
-            <div>
-              <h4 className="font-bold capitalize">{skill.skill_name.replace('-', ' ')}</h4>
-              <p className="text-xs text-slate-500 mt-1">Execution: {skill.execution_time_ms.toFixed(0)}ms</p>
-            </div>
-            <span
-              style={{
-                background: skill.status === 'success' ? '#dcfce7' :
-                           skill.status === 'pending' ? '#fef3c7' : '#fee2e2'
-              }}
-              className="px-3 py-1 rounded-full text-xs font-bold"
-            >
-              {skill.status.toUpperCase()}
-            </span>
-          </div>
-          {skill.status === 'success' && (
-            <pre style={{ fontFamily: EMERALD_DESIGN.fonts.mono }} className="text-xs bg-slate-100 p-3 rounded max-h-32 overflow-auto">
-              {JSON.stringify(skill.output, null, 2)}
-            </pre>
-          )}
-          {skill.error && (
-            <p className="text-sm text-red-600 mt-2">Error: {skill.error}</p>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/**
- * Panel 3: Learning Memory
- * Shows what Hermes has learned over time
- */
-function MemoryPanel() {
-  const [memory, setMemory] = useState<any>(null);
-
-  useEffect(() => {
-    fetch('http://localhost:8000/hermes/memory/summary?tenant_id=aleksa')
-      .then(r => r.json())
-      .then(setMemory);
-  }, []);
-
-  if (!memory) return <div>Loading memory...</div>;
-
-  return (
-    <div className="space-y-4">
-      <div style={{ background: 'white', borderColor: '#e2e8f0' }} className="border-2 rounded-lg p-4 shadow-md">
-        <h3 className="font-bold mb-2">Learning Summary</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-slate-600">Total Trades</p>
-            <p className="text-2xl font-bold">{memory.total_trades}</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-600">Win Rate</p>
-            <p className="text-2xl font-bold">{(memory.win_rate * 100).toFixed(1)}%</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-600">Avg Return</p>
-            <p className="text-2xl font-bold">{(memory.avg_return * 100).toFixed(2)}%</p>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ background: 'white', borderColor: '#e2e8f0' }} className="border-2 rounded-lg p-4 shadow-md">
-        <h3 className="font-bold mb-3">Learned Patterns</h3>
-        <div className="space-y-2">
-          {Object.entries(memory.learned_patterns).map(([name, pattern]: [string, any]) => (
-            <div key={name} className="p-2 rounded bg-slate-100">
-              <span className="font-semibold text-sm">{name}</span>
-              <span className="text-xs text-slate-600 ml-2">Accuracy: {(pattern.accuracy * 100).toFixed(1)}%</span>
+              {msg.role === 'user' && (
+                <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-sm">A</span>
+                </div>
+              )}
             </div>
           ))}
+
+          {loading && (
+            <div className="flex gap-4 justify-start">
+              <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-sm animate-pulse">⚡</span>
+              </div>
+              <div className="bg-slate-700 rounded-lg rounded-bl-none px-4 py-3">
+                <div className="flex gap-2">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
         </div>
       </div>
-    </div>
-  );
-}
 
-/**
- * Panel 4: Compliance & Audit Trail
- * Full transparency on every decision
- */
-function CompliancePanel({ decision }: { decision: HermesDecision }) {
-  return (
-    <div style={{ background: 'white', borderColor: '#e2e8f0' }} className="border-2 rounded-lg p-6 shadow-md">
-      <h3 className="text-lg font-bold mb-4">Audit Trail</h3>
-      <div style={{ fontFamily: EMERALD_DESIGN.fonts.mono }} className="space-y-2 text-sm">
-        {decision.audit_log.map((log, i) => (
-          <div key={i} className="p-2 rounded" style={{ background: '#f1f5f9' }}>
-            {log}
-          </div>
-        ))}
+      {/* Input Area */}
+      <div className="bg-slate-950 border-t border-emerald-500/30 px-6 py-4 shadow-lg">
+        <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-3">
+          <input
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Ask Zeus about any stock... (e.g., 'Should I buy NVDA?' or 'Analyze TSLA')"
+            className="flex-1 bg-slate-800 text-white rounded-lg px-4 py-3 border border-emerald-500/30 focus:border-emerald-500 focus:outline-none placeholder-slate-500 text-sm"
+            disabled={loading}
+          />
+          <button
+            type="submit"
+            disabled={loading || !input.trim()}
+            className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 text-white px-6 py-3 rounded-lg font-medium transition-colors text-sm"
+          >
+            {loading ? 'Analyzing...' : 'Ask Zeus'}
+          </button>
+        </form>
+        
+        {/* Quick Actions */}
+        <div className="max-w-4xl mx-auto mt-3 flex gap-2 flex-wrap">
+          <button
+            onClick={() => setInput('Should I buy NVDA?')}
+            className="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors"
+          >
+            NVDA analysis
+          </button>
+          <button
+            onClick={() => setInput('What are the risks in my tech portfolio?')}
+            className="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors"
+          >
+            Risk check
+          </button>
+          <button
+            onClick={() => setInput('Find me the best entry point for TSLA')}
+            className="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors"
+          >
+            Find entry
+          </button>
+        </div>
       </div>
     </div>
   );

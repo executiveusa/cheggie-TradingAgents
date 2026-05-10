@@ -1,10 +1,10 @@
-# Hermes Orchestrator + Superpowers Implementation Guide
+# Zeus Orchestrator + Superpowers Implementation Guide
 
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│         Aleksa's Hermes Master Dashboard                   │
+│         Aleksa's Zeus Master Dashboard                   │
 │    (/aleksa) - Private orchestration console               │
 │  - Real-time skill execution monitoring                    │
 │  - Convergence analysis (all methods agree?)                │
@@ -13,8 +13,8 @@
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│         Hermes Orchestrator (FastAPI Backend)              │
-│         /apps/backend/hermes_api.py                        │
+│         Zeus Orchestrator (FastAPI Backend)              │
+│         /apps/backend/zeus_api.py                        │
 │  - Core: POST /hermes/analyze (main endpoint)             │
 │  - Calls Superpowers skills in PARALLEL                   │
 │  - Synthesizes decisions via convergence analyzer         │
@@ -62,9 +62,9 @@
 
 ```
 apps/backend/
-├── hermes_orchestrator.py      ⭐ Core: Skill classes + memory + audit
-├── hermes_api.py               ⭐ FastAPI routes + orchestration logic
-├── HERMES_SKILLS_MANIFEST.md   📋 Skills registry + contracts
+├── zeus_orchestrator.py      ⭐ Core: Skill classes + memory + audit
+├── zeus_api.py               ⭐ FastAPI routes + orchestration logic
+├── ZEUS_SKILLS_MANIFEST.md   📋 Skills registry + contracts
 
 apps/web/
 ├── app/aleksa/page.tsx         ⭐ Aleksa's private dashboard
@@ -137,7 +137,7 @@ async def hermes_analyze(req: AnalysisRequest):
 
 ### 3. Systematic Debugging (Superpowers Skill)
 
-When Hermes recommendation is wrong:
+When Zeus recommendation is wrong:
 
 ```python
 # Superpowers: systematic-debugging skill
@@ -160,7 +160,7 @@ if convergence_score < 50:
 
 # PHASE 4: Condition-based-waiting - Monitor regime change
 if market_regime_changed and accuracy < 60%:
-    print("REGIME CHANGE DETECTED - Hermes should have adapted")
+    print("REGIME CHANGE DETECTED - Zeus should have adapted")
     hermes.memory.detect_regime_change(new_regime, triggered_by=["trading-analysis"])
 ```
 
@@ -180,7 +180,7 @@ receiving-code-review skill:
 
 ---
 
-## Running Hermes (Local Development)
+## Running Zeus (Local Development)
 
 ### Start Backend
 
@@ -190,8 +190,8 @@ cd apps/backend
 # Install dependencies
 pip install fastapi uvicorn pydantic
 
-# Run Hermes FastAPI server
-python hermes_api.py
+# Run Zeus FastAPI server
+python zeus_api.py
 # Server runs at http://localhost:8000
 # API docs at http://localhost:8000/docs
 ```
@@ -207,10 +207,10 @@ npm install
 # Run Next.js dev server
 npm run dev
 # Open http://localhost:3000/aleksa (Aleksa dashboard)
-# Open http://localhost:3000/hermes (white-label dashboard)
+# Open http://localhost:3000/zeus (white-label dashboard)
 ```
 
-### Test Hermes Orchestrator
+### Test Zeus Orchestrator
 
 ```bash
 # Option 1: Direct API call
@@ -240,7 +240,7 @@ curl http://localhost:8000/hermes/memory/summary?tenant_id=aleksa
 
 ### Tier 1: Platform Licensing (Aleksa)
 - **Cost:** $5k-50k/month per tenant
-- **Included:** Hermes orchestrator + 5 white-label seats
+- **Included:** Zeus orchestrator + 5 white-label seats
 - **Support:** Email support, quarterly reviews
 
 ### Tier 2: Premium Features
@@ -249,7 +249,7 @@ curl http://localhost:8000/hermes/memory/summary?tenant_id=aleksa
 - **Compliance Reporting Module:** +$3k/month
 
 ### Tier 3: Skills Marketplace
-- Hermes discovers new trading patterns
+- Zeus discovers new trading patterns
 - Pattern becomes a skill
 - Aleksa earns 70% of licensing revenue
 - Creator earns 30%
@@ -272,7 +272,7 @@ curl http://localhost:8000/hermes/memory/summary?tenant_id=aleksa
 ## Deployment Strategy
 
 ### Phase 1: MVP (This Week)
-- [x] Hermes orchestrator built
+- [x] Zeus orchestrator built
 - [x] Superpowers skills manifest created
 - [ ] TradingAgents bridge tested
 - [ ] Aleksa dashboard live
@@ -303,7 +303,7 @@ curl http://localhost:8000/hermes/memory/summary?tenant_id=aleksa
 ```bash
 # 1. Start backend orchestrator
 cd /vercel/share/v0-project/apps/backend
-python hermes_api.py &
+python zeus_api.py &
 
 # 2. Connect to TradingAgents service
 # (Must be running separately on port 8001)
@@ -334,7 +334,7 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 | **Simple** | YAGNI (don't build features nobody needs) |
 | **Verified** | Every claim backed by audit log |
 | **Parallel** | Skills execute together, not sequentially |
-| **Learnable** | Hermes stores outcomes → improves over time |
+| **Learnable** | Zeus stores outcomes → improves over time |
 | **Compliant** | Full audit trail for SEC/FCA |
 | **Scalable** | Per-tenant isolation for 1000s of clients |
 

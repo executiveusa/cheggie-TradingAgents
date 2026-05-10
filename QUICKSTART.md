@@ -1,25 +1,25 @@
-# Hermes Orchestrator - Quick Start Guide
+# Zeus Orchestrator - Quick Start Guide
 
 ## What You Just Built
 
-A **production-grade financial orchestration OS** with Hermes as the master conductor. Here's what happens:
+A **production-grade financial orchestration OS** with Zeus as the master conductor. Here's what happens:
 
 ```
 User asks "Should I buy NVDA?" 
     ↓
-Hermes calls 4 analysis engines in parallel (3 min total)
+Zeus calls 4 analysis engines in parallel (3 min total)
 ├─ TradingAgents (fundamental + sentiment + technical)
 ├─ Anthropic /comps (valuation multiples)
 ├─ Anthropic /dcf (intrinsic value)
 └─ Risk assessment (portfolio impact)
     ↓
-Hermes synthesizes: "BUY NVDA, 78% confidence, all methods agree"
+Zeus synthesizes: "BUY NVDA, 78% confidence, all methods agree"
     ↓
 Auto-generated IC memo + audit trail for compliance
     ↓
-Updates Hermes memory: This pattern works 82% of the time
+Updates Zeus memory: This pattern works 82% of the time
     ↓
-Next time similar opportunity appears → Hermes recognizes it
+Next time similar opportunity appears → Zeus recognizes it
 ```
 
 ---
@@ -43,9 +43,9 @@ Next time similar opportunity appears → Hermes recognizes it
 ### Backend (Python/FastAPI)
 ```
 apps/backend/
-├── hermes_orchestrator.py      ✅ 348 lines - Core orchestrator + memory
-├── hermes_api.py               ✅ 452 lines - FastAPI routes
-└── HERMES_SKILLS_MANIFEST.md   ✅ 283 lines - Skills registry
+├── zeus_orchestrator.py      ✅ 348 lines - Core orchestrator + memory
+├── zeus_api.py               ✅ 452 lines - FastAPI routes
+└── ZEUS_SKILLS_MANIFEST.md   ✅ 283 lines - Skills registry
 ```
 
 ### Frontend (React/Next.js)
@@ -87,7 +87,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install fastapi uvicorn pydantic
 
 # Start server
-python hermes_api.py
+python zeus_api.py
 # ✅ Server running at http://localhost:8000
 # ✅ API docs at http://localhost:8000/docs
 ```
@@ -176,10 +176,10 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 ### 4. Learning Memory
 - Access via `/hermes/memory/summary?tenant_id=aleksa`
 - Shows: win rate, avg return, learned patterns
-- Hermes adapts as new market regimes detected
+- Zeus adapts as new market regimes detected
 
 ### 5. Multi-Tenant Isolation
-- Each tenant gets isolated Hermes instance
+- Each tenant gets isolated Zeus instance
 - Separate memory, separate audit trail
 - Tenant-specific branding
 - Full data isolation
@@ -196,7 +196,7 @@ The `/trading-analysis` skill currently returns mock data. To connect real Tradi
 cd /path/to/cheggie-TradingAgents
 python -m tradingagents.api.server --port 8001
 
-# In hermes_api.py, update _execute_trading_analysis():
+# In zeus_api.py, update _execute_trading_analysis():
 async def _execute_trading_analysis(ticker, lookback_days):
     response = await fetch("http://localhost:8001/api/analyze", {
         "ticker": ticker,
@@ -298,7 +298,7 @@ FROM python:3.11-slim
 WORKDIR /app
 COPY apps/backend .
 RUN pip install -r requirements.txt
-CMD ["python", "hermes_api.py"]
+CMD ["python", "zeus_api.py"]
 ```
 
 ```bash
@@ -345,14 +345,14 @@ pip freeze | grep fastapi  # Should be installed
 # Check backend is running
 curl http://localhost:8000/health  # Should return 200
 
-# Check CORS is enabled (it is in hermes_api.py)
+# Check CORS is enabled (it is in zeus_api.py)
 # Check environment variable
 echo $NEXT_PUBLIC_API_URL  # Should be http://localhost:8000
 ```
 
-### Hermes not making decisions
+### Zeus not making decisions
 ```bash
-# Check logs in terminal running hermes_api.py
+# Check logs in terminal running zeus_api.py
 # Look for "Executing skills..." messages
 # Check skill results returned successfully
 
@@ -408,7 +408,7 @@ curl http://localhost:8000/hermes/debug/skills  # List all skills
 **Architecture questions?** → See `IMPLEMENTATION_GUIDE.md`
 **API documentation?** → Visit `http://localhost:8000/docs` (Swagger)
 **Design system?** → Check `emerald-tablet.css`
-**Skills manifest?** → Read `HERMES_SKILLS_MANIFEST.md`
+**Skills manifest?** → Read `ZEUS_SKILLS_MANIFEST.md`
 
 ---
 
@@ -416,7 +416,7 @@ curl http://localhost:8000/hermes/debug/skills  # List all skills
 
 | Metric | Target | Status |
 |--------|--------|--------|
-| Hermes learns regime changes | 3+ per month | 📊 Monitor |
+| Zeus learns regime changes | 3+ per month | 📊 Monitor |
 | Convergence score average | >70% | 📊 Monitor |
 | White-label tenants | 1 by week 4 | 📅 Deadline |
 | MRR | $5k+ | 💰 Goal |
@@ -425,6 +425,6 @@ curl http://localhost:8000/hermes/debug/skills  # List all skills
 
 ---
 
-**You're now running Hermes - the master financial orchestrator with learning memory, enterprise compliance, and white-label revenue potential.**
+**You're now running Zeus - the master financial orchestrator with learning memory, enterprise compliance, and white-label revenue potential.**
 
 **Ready to make Aleksa real money? 🚀**

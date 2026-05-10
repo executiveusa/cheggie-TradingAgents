@@ -1,4 +1,4 @@
-# Hermes Master Agent Orchestrator - Design Specification
+# Zeus Master Agent Orchestrator - Design Specification
 
 ## Problem Statement (What Aleksa Really Needs)
 
@@ -11,7 +11,7 @@
 
 **Desired Outcome:** Transform into an autonomous financial OS where:
 - **Aleksa gets recurring revenue** ($5k-50k/month per white-label tenant)
-- **Hermes continuously learns** what trading patterns work in each market regime
+- **Zeus continuously learns** what trading patterns work in each market regime
 - **Enterprise clients get compliance ready reports** (IC memos, trade reconciliation, KYC checks)
 - **Valuation convergence** (TradingAgents consensus + Comps + DCF all agree = high conviction)
 - **Multi-platform presence** (Telegram/Slack/Discord integration for immediate alerts)
@@ -22,7 +22,7 @@
 
 ### Layer 1: Master Orchestrator (Hermes)
 ```
-Hermes Agent (Claude Opus 4.6 with persistent memory)
+Zeus Agent (Claude Opus 4.6 with persistent memory)
 ├── Receives: User query or market trigger
 ├── Calls Superpowers skills in parallel:
 │   ├── /trading-analysis (TradingAgents)
@@ -37,7 +37,7 @@ Hermes Agent (Claude Opus 4.6 with persistent memory)
 ### Implementation Roadmap (Superpowers TDD)
 
 **Phase 1: Core Orchestrator (2 days)**
-- Hermes skill registration + dispatcher
+- Zeus skill registration + dispatcher
 - TradingAgents bridge endpoint
 - Anthropic skills integration
 - Memory system (Redis + vector DB)

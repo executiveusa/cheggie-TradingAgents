@@ -1,4 +1,4 @@
-# Hermes Orchestrator - Complete Documentation Index
+# Zeus Orchestrator - Complete Documentation Index
 
 ## 📋 Quick Navigation
 
@@ -11,9 +11,9 @@
 - **Implementation:** [`IMPLEMENTATION_GUIDE.md`](./IMPLEMENTATION_GUIDE.md) - Phase 1-4 roadmap
 
 ### For Technical People (30 min deep dive)
-- **Backend:** [`apps/backend/hermes_orchestrator.py`](./apps/backend/hermes_orchestrator.py) - 348 lines
-- **API Routes:** [`apps/backend/hermes_api.py`](./apps/backend/hermes_api.py) - 452 lines
-- **Skills:** [`apps/backend/HERMES_SKILLS_MANIFEST.md`](./apps/backend/HERMES_SKILLS_MANIFEST.md) - Complete skills registry
+- **Backend:** [`apps/backend/zeus_orchestrator.py`](./apps/backend/zeus_orchestrator.py) - 348 lines
+- **API Routes:** [`apps/backend/zeus_api.py`](./apps/backend/zeus_api.py) - 452 lines
+- **Skills:** [`apps/backend/ZEUS_SKILLS_MANIFEST.md`](./apps/backend/ZEUS_SKILLS_MANIFEST.md) - Complete skills registry
 
 ### For Design People (15 min read)
 - **Dashboard:** [`apps/web/app/aleksa/page.tsx`](./apps/web/app/aleksa/page.tsx) - 387 lines
@@ -41,7 +41,7 @@
 
 ### Pain Point 1: No Revenue Model
 **Before:** TradingAgents = research tool (no customers, $0 income)
-**After:** Hermes orchestrator = white-label platform ($5k-50k/mo per customer)
+**After:** Zeus orchestrator = white-label platform ($5k-50k/mo per customer)
 
 ### Pain Point 2: Decision Quality
 **Before:** "Best guess" from one system
@@ -57,7 +57,7 @@
 
 ### Pain Point 5: No Learning Loop
 **Before:** Static rules forever
-**After:** Hermes learns P&L, detects regime changes, improves autonomously
+**After:** Zeus learns P&L, detects regime changes, improves autonomously
 
 ### Pain Point 6: No White-Label Capability
 **Before:** Impossible to resell
@@ -65,11 +65,11 @@
 
 ---
 
-## 🔧 Running Hermes (60 seconds)
+## 🔧 Running Zeus (60 seconds)
 
 ```bash
 # Terminal 1: Backend
-cd apps/backend && python hermes_api.py
+cd apps/backend && python zeus_api.py
 
 # Terminal 2: Frontend
 cd apps/web && npm run dev
@@ -91,7 +91,7 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 ## 📊 Revenue Model
 
 ### Tier 1: Platform Licensing ($5k-50k/mo per customer)
-- Hermes orchestrator (unlimited trades)
+- Zeus orchestrator (unlimited trades)
 - 5 white-label seats
 - Basic support
 - **Example:** 5 customers @ $10k/mo = $50k/mo
@@ -103,7 +103,7 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 - Custom integrations
 
 ### Tier 3: Skills Marketplace ($100-5k/mo per skill)
-- Hermes discovers new trading pattern
+- Zeus discovers new trading pattern
 - Becomes a "skill" (like `/divergence-detector`)
 - Other customers license it
 - **Revenue split:** Aleksa 70%, Creator 30%
@@ -117,7 +117,7 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 ```
 User Interface Layer
     ↓ HTTP + WebSocket
-Hermes Orchestrator (FastAPI)
+Zeus Orchestrator (FastAPI)
     ↓ Parallel skill dispatch
 Skill Execution Layer
     ├─ TradingAgents
@@ -148,9 +148,9 @@ Reporting (IC Memos, Compliance, Distribution)
 - [`SUPERPOWERS_IMPLEMENTATION_SPEC.md`](./SUPERPOWERS_IMPLEMENTATION_SPEC.md) - Methodology
 
 ### API & Backend
-- [`apps/backend/hermes_orchestrator.py`](./apps/backend/hermes_orchestrator.py) - Core classes
-- [`apps/backend/hermes_api.py`](./apps/backend/hermes_api.py) - FastAPI routes
-- [`apps/backend/HERMES_SKILLS_MANIFEST.md`](./apps/backend/HERMES_SKILLS_MANIFEST.md) - Skills registry
+- [`apps/backend/zeus_orchestrator.py`](./apps/backend/zeus_orchestrator.py) - Core classes
+- [`apps/backend/zeus_api.py`](./apps/backend/zeus_api.py) - FastAPI routes
+- [`apps/backend/ZEUS_SKILLS_MANIFEST.md`](./apps/backend/ZEUS_SKILLS_MANIFEST.md) - Skills registry
 
 ### Frontend & Design
 - [`apps/web/app/aleksa/page.tsx`](./apps/web/app/aleksa/page.tsx) - Admin dashboard
@@ -161,7 +161,7 @@ Reporting (IC Memos, Compliance, Distribution)
 
 ## 🔑 Key Concepts
 
-### Hermes Master Orchestrator
+### Zeus Master Orchestrator
 - Coordinates 6+ analytical skills in parallel
 - Synthesizes decisions via convergence analysis
 - Learns outcomes for continuous improvement
@@ -180,7 +180,7 @@ Reporting (IC Memos, Compliance, Distribution)
 - Applied as: primary #10b981, secondary #1e293b, accent #f59e0b
 
 ### Multi-Tenant Architecture
-- Each tenant = isolated Hermes instance
+- Each tenant = isolated Zeus instance
 - Separate memory (can't see other trades)
 - Separate audit trail (compliance per tenant)
 - Separate learned patterns (unique strategies)
@@ -225,7 +225,7 @@ Track these metrics:
 
 | Metric | Target | Timeline |
 |--------|--------|----------|
-| Hermes learns regime changes | 3+ per month | Week 2 |
+| Zeus learns regime changes | 3+ per month | Week 2 |
 | Convergence score average | >70% | Week 3 |
 | First white-label customer | 1 paid | Week 4 |
 | MRR achieved | $5k+ | Week 4-5 |
@@ -243,7 +243,7 @@ Track these metrics:
 4. ✅ **Parallel** - Skills don't wait for each other
 5. ✅ **Verified** - Full audit trail, not claims
 6. ✅ **Simple** - YAGNI principle throughout
-7. ✅ **Learnable** - Hermes improves from experience
+7. ✅ **Learnable** - Zeus improves from experience
 
 ---
 
@@ -259,7 +259,7 @@ Track these metrics:
 → Check `apps/web/emerald-tablet.css`
 
 **Skill contracts?**
-→ Read `apps/backend/HERMES_SKILLS_MANIFEST.md`
+→ Read `apps/backend/ZEUS_SKILLS_MANIFEST.md`
 
 **How to run?**
 → Follow `QUICKSTART.md`
@@ -278,7 +278,7 @@ Track these metrics:
 - Status: ✅ Ready for deployment
 
 **What works:**
-- ✅ Hermes orchestration engine
+- ✅ Zeus orchestration engine
 - ✅ Parallel skill execution
 - ✅ Convergence analysis
 - ✅ Aleksa private dashboard

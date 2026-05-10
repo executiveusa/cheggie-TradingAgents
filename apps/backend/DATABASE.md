@@ -1,8 +1,8 @@
-# Hermes Database Schema & Operations
+# Zeus Agent Database Schema & Operations
 
 ## Overview
 
-The Hermes orchestrator uses Supabase (PostgreSQL) as the primary database with complete multi-tenant isolation, Row-Level Security (RLS), and audit trails for institutional compliance.
+The Zeus agent uses Supabase (PostgreSQL) as the primary database with complete multi-tenant isolation, Row-Level Security (RLS), and audit trails for institutional compliance.
 
 ## Schema Structure
 
@@ -45,7 +45,7 @@ The Hermes orchestrator uses Supabase (PostgreSQL) as the primary database with 
 - ticker (TEXT) - Stock symbol
 - query (TEXT) - User question/request
 - decision_type (ENUM) - BUY, SELL, HOLD, ANALYZE
-- confidence_score (FLOAT 0-1) - Hermes confidence
+- confidence_score (FLOAT 0-1) - Zeus confidence
 - convergence_score (FLOAT 0-1) - How much methods agree
 - status (ENUM) - pending, analyzing, completed, failed
 - metadata (JSONB) - Additional context
@@ -89,7 +89,7 @@ The Hermes orchestrator uses Supabase (PostgreSQL) as the primary database with 
 
 ---
 
-#### 6. **hermes_memory** - Learning system (audit-trailed)
+#### 6. **zeus_memory** - Learning system (audit-trailed)
 ```sql
 - id (UUID, PK)
 - tenant_id (UUID, FK)
@@ -102,7 +102,7 @@ The Hermes orchestrator uses Supabase (PostgreSQL) as the primary database with 
 - created_at, updated_at
 ```
 
-**Example Memory:** Hermes detects "tech sector shows positive sentiment on earnings beats" after 5 trades
+**Example Memory:** Zeus detects "tech sector shows positive sentiment on earnings beats" after 5 trades
 
 ---
 

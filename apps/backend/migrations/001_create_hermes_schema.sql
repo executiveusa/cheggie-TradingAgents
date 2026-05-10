@@ -1,4 +1,4 @@
--- Hermes Financial Orchestrator - Complete Schema
+-- Zeus Agent Financial Orchestrator - Complete Schema
 -- This schema supports multi-tenant white-label deployment with full audit trails
 
 -- Enable UUID extension
@@ -132,9 +132,9 @@ CREATE POLICY "Users can view convergence analysis" ON public.convergence_analys
   ));
 
 -- ============================================================================
--- HERMES MEMORY TABLE (Learning + audit trail)
+-- ZEUS MEMORY TABLE (Learning + audit trail)
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS public.hermes_memory (
+CREATE TABLE IF NOT EXISTS public.zeus_memory (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   memory_type TEXT NOT NULL CHECK (memory_type IN (
@@ -153,9 +153,9 @@ CREATE TABLE IF NOT EXISTS public.hermes_memory (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE public.hermes_memory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.zeus_memory ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view memory for their tenant" ON public.hermes_memory
+CREATE POLICY "Users can view memory for their tenant" ON public.zeus_memory
   FOR SELECT USING (tenant_id IN (
     SELECT tenant_id FROM public.users WHERE id = auth.uid()::uuid
   ));
@@ -272,9 +272,9 @@ CREATE INDEX idx_skill_results_decision ON public.skill_results(trading_decision
 CREATE INDEX idx_skill_results_tenant ON public.skill_results(tenant_id);
 CREATE INDEX idx_skill_results_skill ON public.skill_results(skill_name);
 
-CREATE INDEX idx_hermes_memory_tenant ON public.hermes_memory(tenant_id);
-CREATE INDEX idx_hermes_memory_type ON public.hermes_memory(memory_type);
-CREATE INDEX idx_hermes_memory_ticker ON public.hermes_memory(ticker);
+CREATE INDEX idx_zeus_memory_tenant ON public.zeus_memory(tenant_id);
+CREATE INDEX idx_zeus_memory_type ON public.zeus_memory(memory_type);
+CREATE INDEX idx_zeus_memory_ticker ON public.zeus_memory(ticker);
 
 CREATE INDEX idx_audit_trail_tenant ON public.audit_trail(tenant_id);
 CREATE INDEX idx_audit_trail_created ON public.audit_trail(created_at DESC);
@@ -308,7 +308,7 @@ CREATE TRIGGER update_skill_results_updated_at BEFORE UPDATE ON public.skill_res
 CREATE TRIGGER update_convergence_analysis_updated_at BEFORE UPDATE ON public.convergence_analysis
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-CREATE TRIGGER update_hermes_memory_updated_at BEFORE UPDATE ON public.hermes_memory
+CREATE TRIGGER update_zeus_memory_updated_at BEFORE UPDATE ON public.zeus_memory
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 CREATE TRIGGER update_trade_outcomes_updated_at BEFORE UPDATE ON public.trade_outcomes

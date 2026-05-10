@@ -1,17 +1,17 @@
-# Hermes Orchestrator - Architecture Diagram & Data Flow
+# Zeus Orchestrator - Architecture Diagram & Data Flow
 
 ## System Architecture (Visual)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    ALEKSA'S HERMES FINANCIAL OS                             │
+│                    ALEKSA'S ZEUS FINANCIAL OS                             │
 │                                                                              │
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
 │  │              USER INTERFACES (Multi-Tenant Front Door)              │   │
 │  │                                                                      │   │
 │  │  ┌────────────────────────────────┐  ┌────────────────────────────┐ │   │
 │  │  │  ALEKSA PRIVATE DASHBOARD      │  │  WHITE-LABEL TENANTS       │ │   │
-│  │  │  (/aleksa)                     │  │  (/hermes?tenant=X)        │ │   │
+│  │  │  (/aleksa)                     │  │  (/zeus?tenant=X)          │ │   │
 │  │  │                                │  │                            │ │   │
 │  │  │ • Master orchestration         │  │ • Branded UI per customer  │ │   │
 │  │  │ • Convergence analysis         │  │ • IC memo generation       │ │   │
@@ -23,10 +23,10 @@
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │                                  ↓ HTTP + WebSocket                          │
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │              HERMES ORCHESTRATOR LAYER (FastAPI)                    │   │
-│  │              apps/backend/hermes_api.py                             │   │
+│  │              ZEUS ORCHESTRATOR LAYER (FastAPI)                    │   │
+│  │              apps/backend/zeus_api.py                              │   │
 │  │                                                                      │   │
-│  │  POST /hermes/analyze?tenant_id=X                                   │   │
+│  │  POST /zeus/analyze?tenant_id=X                                    │   │
 │  │  │                                                                  │   │
 │  │  ├─► [PHASE 1: PARALLEL SKILL EXECUTION]                           │   │
 │  │  │   ├─ Start: Decision.query, ticker, lookback_days              │   │
@@ -46,7 +46,7 @@
 │  │  ├─► [PHASE 4: DECISION SYNTHESIS]                                │   │
 │  │  │   ├─ Combine all signals                                      │   │
 │  │  │   ├─ Generate recommendation + confidence                     │   │
-│  │  │   └─ → Return HermesDecision object                           │   │
+│  │  │   └─ → Return ZeusDecision object                            │   │
 │  │  │                                                                  │   │
 │  │  └─► [PHASE 5: PERSISTENCE & REPORTING]                           │   │
 │  │      ├─ Audit trail: Log every decision                          │   │
@@ -123,7 +123,7 @@
 │  │            PERSISTENCE LAYER (Memory + Audit)                       │   │
 │  │                                                                      │   │
 │  │  ┌────────────────────────┐  ┌────────────────────────────────────┐ │   │
-│  │  │ HERMES MEMORY SYSTEM   │  │ AUDIT TRAIL (SEC-COMPLIANT)        │ │   │
+│  │  │ ZEUS MEMORY SYSTEM   │  │ AUDIT TRAIL (SEC-COMPLIANT)        │ │   │
 │  │  │                        │  │                                    │ │   │
 │  │  │ Per-tenant storage:    │  │ Every decision logged:             │ │   │
 │  │  │                        │  │                                    │ │   │
@@ -142,7 +142,7 @@
 │  │  │                        │  │ [Query end]                        │ │   │
 │  │  │ Outcome: Next time     │  │                                    │ │   │
 │  │  │ similar pattern appears│  │ → Auto-exported to PDF             │ │   │
-│  │  │ → Hermes recognizes it │  │ → Ready for SEC/FCA audit          │ │   │
+│  │  │ → Zeus recognizes it │  │ → Ready for SEC/FCA audit          │ │   │
 │  │  │ → Improves decision    │  │ → Linked to IC memo                │ │   │
 │  │  └────────────────────────┘  └────────────────────────────────────┘ │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
@@ -378,7 +378,7 @@ def synthesize_decision(skill_results):
 Per-Tenant Subscription
 │
 ├─ Base Platform: $10k/mo
-│  ├─ Hermes orchestrator
+│  ├─ Zeus orchestrator
 │  ├─ 5 white-label seats
 │  └─ Basic support
 │
@@ -404,7 +404,7 @@ Per-Tenant Subscription
 ```
 ALCHEMICAL PRINCIPLE: "That which is below mirrors that which is above"
 
-APPLIED TO HERMES:
+APPLIED TO ZEUS:
 
 Micro (Individual Skill Result):
 ├─ Input: Stock ticker
