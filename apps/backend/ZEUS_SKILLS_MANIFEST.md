@@ -1,6 +1,6 @@
-# Hermes Superpowers Skills Registry
+# Zeus Superpowers Skills Registry
 
-This document defines all skills available to Hermes orchestrator following Superpowers framework.
+This document defines all skills available to Zeus orchestrator following Superpowers framework.
 
 ## Skill Categories
 
@@ -175,7 +175,7 @@ All valuation methods converge on fair value of $153-155...
 ```
 
 #### /report-morning-note
-**Purpose:** Daily market commentary with Hermes insights
+**Purpose:** Daily market commentary with Zeus insights
 **Output:** Markdown report suitable for investor distribution
 
 #### /report-trade-log
@@ -187,12 +187,12 @@ All valuation methods converge on fair value of $153-155...
 ### TIER 5: Learning & Memory (Async)
 
 #### /memory-store-outcome
-**Purpose:** Log actual P&L vs Hermes prediction for learning
+**Purpose:** Log actual P&L vs Zeus prediction for learning
 **Input:** `{ recommendation_id, ticker, predicted_return, actual_return, market_regime }`
 **Triggers:** Automatic regime detection if accuracy <60%
 
 #### /memory-retrieve
-**Purpose:** Query Hermes memory for historical patterns
+**Purpose:** Query Zeus memory for historical patterns
 **Input:** `{ query_type, market_regime, time_period }`
 **Output:** Similar past decisions, success rates, learned patterns
 
@@ -201,7 +201,7 @@ All valuation methods converge on fair value of $153-155...
 ## Execution Flow (Superpowers Orchestration)
 
 ```
-User Query → Hermes Agent
+User Query → Zeus Agent
     ↓
 [PHASE 1: Parallel Analysis - 3 min timeout]
 ├─ /trading-analysis (180s)
@@ -270,7 +270,7 @@ Skills can be registered as marketplace items:
 
 ## Integration Checklist
 
-- [x] Hermes orchestrator class defined
+- [x] Zeus orchestrator class defined
 - [x] Skills manifest created
 - [x] Memory system designed
 - [x] Convergence analyzer ready

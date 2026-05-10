@@ -1,8 +1,8 @@
-# DEPLOYMENT READY: Hermes Orchestrator v1.0
+# DEPLOYMENT READY: Zeus Orchestrator v1.0
 
 **Status**: Complete database schema, backend integration, and PR #4 open for merge
 
-**What's Live**: Everything needed to deploy a production Hermes instance
+**What's Live**: Everything needed to deploy a production Zeus instance
 
 ---
 
@@ -33,12 +33,12 @@ Features:
 ```
 
 ### Backend Files Created
-- `apps/backend/hermes_orchestrator.py` (348 lines) - Core orchestrator
-- `apps/backend/hermes_api.py` (452 lines) - FastAPI routes
+- `apps/backend/zeus_orchestrator.py` (348 lines) - Core orchestrator
+- `apps/backend/zeus_api.py` (452 lines) - FastAPI routes
 - `apps/backend/db/supabase_client.py` (314 lines) - Python DB client
 - `apps/backend/migrations/001_create_hermes_schema.sql` (329 lines) - Schema DDL
 - `apps/backend/DATABASE.md` (356 lines) - Schema reference
-- `apps/backend/HERMES_SKILLS_MANIFEST.md` (283 lines) - Skills registry
+- `apps/backend/ZEUS_SKILLS_MANIFEST.md` (283 lines) - Skills registry
 
 ### Frontend Files Created
 - `apps/web/app/aleksa/page.tsx` (387 lines) - Master dashboard
@@ -85,7 +85,7 @@ export ANTHROPIC_API_KEY=your_anthropic_key
 export OPENAI_API_KEY=your_openai_key
 
 # 3. Run FastAPI server
-python hermes_api.py
+python zeus_api.py
 # → Starts at http://localhost:8000
 # → WebSocket endpoint: ws://localhost:8000/ws/hermes/{tenant_id}
 ```
@@ -111,7 +111,7 @@ npm run dev
 
 ## What's Integrated
 
-### Hermes Orchestrator
+### Zeus Orchestrator
 - Core master agent with memory system
 - Parallel skill execution (8 skills)
 - Convergence analysis engine
@@ -151,7 +151,7 @@ gh pr merge 4 --squash --delete-branch
 ```
 
 ### 2. Connect TradingAgents API
-- Update `apps/backend/hermes_api.py` line ~150
+- Update `apps/backend/zeus_api.py` line ~150
 - Wire skill execution to existing TradingAgents endpoint
 - Test parallel execution: `curl http://localhost:8000/hermes/analyze?ticker=NVDA`
 
@@ -182,7 +182,7 @@ git push origin main
 │                     FRONTEND (React/Next.js)                │
 ├─────────────────────────────────────────────────────────────┤
 │  /aleksa          → Aleksa master dashboard                 │
-│  /hermes          → White-label tenant dashboard            │
+│  /zeus          → White-label tenant dashboard            │
 │  /auth/*          → Authentication flows (email/OAuth)      │
 └──────────────┬──────────────────────────────────────────────┘
                │ SUPABASE CLIENT
@@ -310,7 +310,7 @@ wscat -c ws://localhost:8000/ws/hermes/00000000-0000-0000-0000-000000000001
 ## Revenue Model (Ready to Enable)
 
 Each white-label customer gets:
-- Isolated Hermes instance
+- Isolated Zeus instance
 - Branded dashboard (via emerald-tablet.css)
 - Full audit trails for compliance
 - Real-time WebSocket updates
@@ -329,13 +329,13 @@ Aleksa can launch first customer within 48 hours of merge.
 
 ```
 apps/backend/
-├── hermes_orchestrator.py     ✅ Complete
-├── hermes_api.py              ✅ Complete (with DB)
+├── zeus_orchestrator.py     ✅ Complete
+├── zeus_api.py              ✅ Complete (with DB)
 ├── db/
 │   └── supabase_client.py     ✅ Complete
 ├── migrations/
 │   └── 001_create_hermes_schema.sql  ✅ Applied
-├── HERMES_SKILLS_MANIFEST.md  ✅ Complete
+├── ZEUS_SKILLS_MANIFEST.md  ✅ Complete
 └── DATABASE.md                ✅ Complete
 
 apps/web/
@@ -368,7 +368,7 @@ GitHub:
 # Terminal 1: Backend
 cd apps/backend
 pip install -r requirements.txt
-python hermes_api.py
+python zeus_api.py
 
 # Terminal 2: Frontend
 cd apps/web

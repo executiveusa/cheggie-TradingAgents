@@ -3,7 +3,7 @@
 ## What Changed
 
 ### Frontend UI
-**Old**: Hermes Dashboard with tabs showing skill results
+**Old**: Zeus Dashboard with tabs showing skill results
 **New**: Zeus Chat Interface - Talk to Zeus like an AI assistant
 
 **Aleksa Dashboard** (`/aleksa`)
@@ -53,11 +53,11 @@
 - `apps/web/app/hermes/page.tsx` - White-label chat (kept route for compatibility)
 
 **Updated**:
-- `hermes_api.py` → Now uses Zeus classes and `/zeus/*` endpoints
+- `zeus_api.py` → Now uses Zeus classes and `/zeus/*` endpoints
 - All imports changed from `hermes_*` to `zeus_*`
 
 **Still Exists** (for compatibility):
-- `hermes_orchestrator.py` - Legacy (can be deprecated)
+- `zeus_orchestrator.py` - Legacy (can be deprecated)
 - Old database schema with "hermes" references - Still works
 
 ## What It Actually Does (Plain English)
@@ -135,7 +135,7 @@ Recommendation: Enter at market, set stop at $150.
 
 ## Vocab Simplified
 
-**Was**: "Hermes orchestrator with skill convergence analysis"
+**Was**: "Zeus orchestrator with skill convergence analysis"
 **Now**: "Zeus - ask it stock questions"
 
 **Was**: "Multi-skill synthesis with HermesMemorySystem"

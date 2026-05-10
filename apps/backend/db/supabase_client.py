@@ -1,5 +1,5 @@
 """
-Supabase Client for Hermes Backend
+Supabase Client for Zeus Agent Backend
 Handles all database operations with connection pooling and error handling
 """
 
@@ -178,7 +178,7 @@ class SupabaseClient:
             raise Exception(f"Error creating convergence analysis: {str(e)}")
     
     # ========================================================================
-    # HERMES MEMORY OPERATIONS
+    # ZEUS MEMORY OPERATIONS
     # ========================================================================
     
     async def store_memory(self, tenant_id: str, memory_type: str, content: Dict, ticker: str = None, confidence: float = 0.5) -> str:

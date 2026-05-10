@@ -63,7 +63,7 @@ class SkillExecutionRequest(BaseModel):
 
 
 class MemoryQueryRequest(BaseModel):
-    """Query Hermes memory for learned patterns"""
+    """Query Zeus memory for learned patterns"""
     query_type: str  # "regime_analysis", "pattern_search", "performance"
     market_regime: Optional[str] = None
     days_back: int = 30

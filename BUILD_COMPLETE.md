@@ -1,4 +1,4 @@
-# 🚀 HERMES ORCHESTRATOR - BUILD COMPLETE
+# 🚀 ZEUS ORCHESTRATOR - BUILD COMPLETE
 
 ## What You Now Have
 
@@ -11,9 +11,9 @@ A **production-grade financial OS** that transforms TradingAgents into a white-l
 ### Backend (Python/FastAPI)
 ```
 apps/backend/
-├── hermes_orchestrator.py      348 lines ⭐ Core engine
-├── hermes_api.py               452 lines ⭐ API routes  
-└── HERMES_SKILLS_MANIFEST.md   283 lines 📋 Skills registry
+├── zeus_orchestrator.py      348 lines ⭐ Core engine
+├── zeus_api.py               452 lines ⭐ API routes  
+└── ZEUS_SKILLS_MANIFEST.md   283 lines 📋 Skills registry
 ```
 
 **What it does:**
@@ -73,7 +73,7 @@ apps/web/
 "Should I buy NVDA?"
 ```
 
-### Hermes Orchestrates Analysis (Parallel, not sequential)
+### Zeus Orchestrates Analysis (Parallel, not sequential)
 ```
 Timeline visualization:
 0:00    Start
@@ -99,7 +99,7 @@ Timeline visualization:
 └─ Approved: YES
 │
 3:03    Decision Generated + Memory Updated
-└─ HERMES: "BUY NVDA, 78% confidence, all methods agree"
+└─ ZEUS: "BUY NVDA, 78% confidence, all methods agree"
 ```
 
 ---
@@ -107,7 +107,7 @@ Timeline visualization:
 ## 📊 BUSINESS MODEL
 
 ### Revenue Tier 1: Platform ($5k-50k/mo per customer)
-- Hermes orchestrator (unlimited trades)
+- Zeus orchestrator (unlimited trades)
 - Multi-tenant white-label UI
 - 5 branded seats
 - Basic support
@@ -119,7 +119,7 @@ Timeline visualization:
 - Portfolio analytics
 
 ### Revenue Tier 3: Skills Marketplace
-- Hermes discovers new patterns (e.g., "/divergence-detector")
+- Zeus discovers new patterns (e.g., "/divergence-detector")
 - Becomes a skill others can license
 - Aleksa takes 70%, Creator takes 30%
 - Potential: $5k-10k/mo per skill
@@ -143,7 +143,7 @@ Gross Margin: 85%+
 ```bash
 cd apps/backend
 pip install fastapi uvicorn pydantic
-python hermes_api.py
+python zeus_api.py
 # ✅ Running at http://localhost:8000
 ```
 
@@ -158,13 +158,13 @@ npm run dev
 ### Access Dashboards
 ```
 ALEKSA DASHBOARD:      http://localhost:3000/aleksa
-WHITE-LABEL DEMO:      http://localhost:3000/hermes?tenant=client-a
+WHITE-LABEL DEMO:      http://localhost:3000/zeus?tenant=client-a
 API DOCS:              http://localhost:8000/docs
 ```
 
 ### Test the System
 ```bash
-curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
+curl -X POST http://localhost:8000/zeus/analyze?tenant_id=aleksa \
   -H "Content-Type: application/json" \
   -d '{"query": "Buy NVDA?", "ticker": "NVDA", "lookback_days": 90}'
 ```
@@ -179,7 +179,7 @@ curl -X POST http://localhost:8000/hermes/analyze?tenant_id=aleksa \
 ✅ **Parallel** - Skills execute simultaneously (not sequential)
 ✅ **Verified** - Every decision has audit trail (not claims)
 ✅ **Simple** - YAGNI principle throughout
-✅ **Learnable** - Hermes improves from experience
+✅ **Learnable** - Zeus improves from experience
 
 ### Key Superpowers Pattern: Parallel Execution
 ```python
@@ -198,7 +198,7 @@ results = await asyncio.gather(skill1(), skill2())  # Max 180s
 
 **Philosophy:** "That which is below mirrors that which is above"
 
-Applied to Hermes:
+Applied to Zeus:
 - **Micro** (individual skill result) mirrors **Macro** (complete decision)
 - **One truth** flows through many methods (TradingAgents + Comps + DCF + Risk)
 - **Hidden patterns** become visible (learning + memory)
@@ -233,7 +233,7 @@ Applied to Hermes:
 - KYC + GL reconciliation included
 
 ### 5. Multi-Tenant Isolation
-- Each tenant has isolated Hermes instance
+- Each tenant has isolated Zeus instance
 - Separate memory (can't see other trades)
 - Separate audit trail (compliance per tenant)
 - Branded UI per customer
@@ -282,7 +282,7 @@ Applied to Hermes:
 | Metric | Target | Status |
 |--------|--------|--------|
 | Convergence score avg | >70% | 📊 Monitor |
-| Hermes learns regimes | 3+/month | 📊 Monitor |
+| Zeus learns regimes | 3+/month | 📊 Monitor |
 | First white-label tenant | 1 paid | ⏰ Week 4 |
 | MRR achieved | $5k+ | 💰 Goal |
 | Audit trail coverage | 100% | ✅ Done |
@@ -346,7 +346,7 @@ The design system is integrated.
 
 ```
 ┌─────────────────────────────────────┐
-│  HERMES MASTER ORCHESTRATOR v1.0.0  │
+│  ZEUS MASTER ORCHESTRATOR v1.0.0  │
 │  Financial Decision Engine          │
 │  Multi-Tenant, Learning-Enabled     │
 │  White-Label Revenue Model          │
