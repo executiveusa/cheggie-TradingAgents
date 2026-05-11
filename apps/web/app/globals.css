@@ -1,153 +1,72 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* ============================================================
-   CHEGGIE TRADE — Emerald Tablet Design System
-   Light mode defaults / dark mode via .dark class
-   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg-base: #f0faf4;
-  --bg-card: #ffffff;
-  --bg-subtle: #e8f5ed;
-  --accent-emerald: #15803d;
-  --accent-emerald-dim: #166534;
-  --accent-green-label: #16a34a;
-  --text-primary: #0a1a0f;
-  --text-secondary: #4a7c59;
-  --border: rgba(21, 128, 61, 0.2);
-  --code-green: #166534;
-  --glow: 0 0 24px rgba(21, 128, 61, 0.18);
-  --glow-lg: 0 0 48px rgba(21, 128, 61, 0.22);
+  --ct-bg: #080f0b;
+  --ct-card: #0d1a12;
+  --ct-subtle: #122018;
+  --ct-emerald: #22c55e;
+  --ct-emerald-dim: #15803d;
+  --ct-emerald-glow: rgba(34,197,94,0.15);
+  --ct-text: #f1f5f2;
+  --ct-muted: #8fa896;
+  --ct-border: rgba(34,197,94,0.15);
+  --ct-code: #86efac;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
 }
 
-.dark {
-  --bg-base: #080f0b;
-  --bg-card: #0d1a12;
-  --bg-subtle: #122018;
-  --accent-emerald: #22c55e;
-  --accent-emerald-dim: #15803d;
-  --accent-green-label: #4ade80;
-  --text-primary: #f1f5f2;
-  --text-secondary: #8fa896;
-  --border: rgba(34, 197, 94, 0.15);
-  --code-green: #86efac;
-  --glow: 0 0 24px rgba(34, 197, 94, 0.18);
-  --glow-lg: 0 0 48px rgba(34, 197, 94, 0.22);
+.light {
+  --ct-bg: #f0faf4;
+  --ct-card: #ffffff;
+  --ct-subtle: #e8f5ed;
+  --ct-emerald: #15803d;
+  --ct-emerald-dim: #166534;
+  --ct-emerald-glow: rgba(21,128,61,0.12);
+  --ct-text: #0a1a0f;
+  --ct-muted: #4a7c59;
+  --ct-border: rgba(21,128,61,0.2);
+  --ct-code: #166534;
 }
 
-/* ============================================================
-   BASE RESET
-   ============================================================ */
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif);
+  font-family: var(--font-sans);
+  background: var(--ct-bg);
+  color: var(--ct-text);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+a { color: inherit; text-decoration: none; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
 }
-
-/* ============================================================
-   TYPOGRAPHY
-   ============================================================ */
-
-h1, h2, h3, h4 {
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(34,197,94,0.3)); }
+  50% { filter: drop-shadow(0 0 24px rgba(34,197,94,0.7)); }
 }
-
-p {
-  color: var(--text-secondary);
-}
-
-/* ============================================================
-   UTILITY CLASSES
-   ============================================================ */
-
-.label-mono {
-  font-family: var(--font-mono, 'DM Mono', monospace);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent-green-label);
-}
-
-.glow-card {
-  box-shadow: var(--glow);
-  border: 1px solid var(--border);
-}
-
-.glow-card-lg {
-  box-shadow: var(--glow-lg);
-  border: 1px solid var(--border);
-}
-
-/* Horizontal progress bar animation for Hermes loading */
 @keyframes progress-slide {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(400%); }
 }
 
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-glow { animation: glow-pulse 4s ease-in-out infinite; }
+
 .hermes-progress-bar {
   overflow: hidden;
   height: 2px;
-  background-color: var(--bg-subtle);
+  background-color: var(--ct-subtle);
 }
-
 .hermes-progress-bar::after {
   content: '';
   display: block;
   height: 100%;
   width: 25%;
-  background-color: var(--accent-emerald);
+  background-color: var(--ct-emerald);
   animation: progress-slide 1.4s ease-in-out infinite;
-}
-
-/* Floating logo animation */
-@keyframes logo-float {
-  0%, 100% { transform: translateY(-12px); }
-  50% { transform: translateY(12px); }
-}
-
-@keyframes glow-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.4)); }
-  50% { filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.7)); }
-}
-
-.logo-float {
-  animation: logo-float 6s ease-in-out infinite, glow-pulse 6s ease-in-out infinite;
-}
-
-/* Nav active underline */
-.nav-link-active {
-  position: relative;
-}
-
-.nav-link-active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: var(--accent-emerald);
 }
