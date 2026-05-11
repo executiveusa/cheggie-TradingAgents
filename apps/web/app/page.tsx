@@ -306,3 +306,100 @@ export default function Page() {
     </main>
   );
 }
+            ].map((feature, i) => (
+              <div 
+                key={i}
+                className="glass-card rounded-2xl p-8 hover:border-emerald-500/30 transition-all hover:-translate-y-1 group"
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold mb-3 group-hover:text-emerald-400 transition-colors">{feature.title}</h3>
+                <p className="text-white/50 leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="relative py-32 border-t border-white/5">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-5xl font-black mb-6">
+              Three Steps to
+              <br />
+              <span className="gradient-text">Better Trades</span>
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-12">
+            {[
+              {
+                step: '01',
+                title: 'Ask Zeus',
+                desc: 'Type any trading question in plain English. "Should I buy NVDA?" or "Analyze AAPL for swing trade."'
+              },
+              {
+                step: '02',
+                title: 'Zeus Analyzes',
+                desc: 'In 3 minutes, Zeus runs trading analysis, valuations, risk checks, and compliance in parallel.'
+              },
+              {
+                step: '03',
+                title: 'You Execute',
+                desc: 'Get a clear recommendation with confidence score, entry points, stop-loss, and reasoning.'
+              }
+            ].map((item, i) => (
+              <div key={i} className="relative">
+                <div className="text-8xl font-black text-white/5 absolute -top-6 -left-2">{item.step}</div>
+                <div className="relative pt-12">
+                  <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                  <p className="text-white/50 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative py-32 border-t border-white/5">
+        <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 to-transparent pointer-events-none" />
+        <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center relative">
+          <h2 className="text-4xl lg:text-6xl font-black mb-6">
+            Ready to Trade
+            <br />
+            <span className="gradient-text">Like a Pro?</span>
+          </h2>
+          <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto">
+            Join traders who use Zeus to make better decisions with institutional-grade analysis.
+          </p>
+          <Link 
+            href="/aleksa" 
+            className="inline-block px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 text-black font-bold text-lg hover:shadow-[0_0_60px_rgba(16,185,129,0.4)] transition-all hover:scale-105"
+          >
+            Launch Zeus Now
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+                <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z" />
+                </svg>
+              </div>
+              <span className="font-bold">Zeus</span>
+            </div>
+            <div className="text-white/40 text-sm">
+              AI-Powered Trading Analysis Platform
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
