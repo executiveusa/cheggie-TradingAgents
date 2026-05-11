@@ -1,38 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   CHEGGIE TRADE — Emerald Tablet Design System
+   Light mode defaults / dark mode via .dark class
+   ============================================================ */
 
 :root {
-  /* Core Colors */
-  --background: 0 0% 0%;
-  --foreground: 0 0% 98%;
-  
-  /* Primary - Emerald/Green */
-  --primary: 160 84% 39%;
-  --primary-foreground: 0 0% 100%;
-  
-  /* Secondary - Slate */
-  --secondary: 215 28% 17%;
-  --secondary-foreground: 210 40% 98%;
-  
-  /* Accent - Gold */
-  --accent: 45 93% 47%;
-  --accent-foreground: 0 0% 0%;
-  
-  /* Muted */
-  --muted: 215 28% 17%;
-  --muted-foreground: 215 20% 65%;
-  
-  /* Card */
-  --card: 0 0% 4%;
-  --card-foreground: 0 0% 98%;
-  
-  /* Border */
-  --border: 215 28% 17%;
-  
-  /* Radius */
-  --radius: 0.75rem;
+  --bg-base: #f0faf4;
+  --bg-card: #ffffff;
+  --bg-subtle: #e8f5ed;
+  --accent-emerald: #15803d;
+  --accent-emerald-dim: #166534;
+  --accent-green-label: #16a34a;
+  --text-primary: #0a1a0f;
+  --text-secondary: #4a7c59;
+  --border: rgba(21, 128, 61, 0.2);
+  --code-green: #166534;
+  --glow: 0 0 24px rgba(21, 128, 61, 0.18);
+  --glow-lg: 0 0 48px rgba(21, 128, 61, 0.22);
 }
 
-* {
+.dark {
+  --bg-base: #080f0b;
+  --bg-card: #0d1a12;
+  --bg-subtle: #122018;
+  --accent-emerald: #22c55e;
+  --accent-emerald-dim: #15803d;
+  --accent-green-label: #4ade80;
+  --text-primary: #f1f5f2;
+  --text-secondary: #8fa896;
+  --border: rgba(34, 197, 94, 0.15);
+  --code-green: #86efac;
+  --glow: 0 0 24px rgba(34, 197, 94, 0.18);
+  --glow-lg: 0 0 48px rgba(34, 197, 94, 0.22);
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -43,10 +52,10 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  line-height: 1.6;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans, 'DM Sans', system-ui, sans-serif);
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -56,79 +65,89 @@ a {
   text-decoration: none;
 }
 
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+h1, h2, h3, h4 {
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+p {
+  color: var(--text-secondary);
 }
 
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.label-mono {
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-green-label);
 }
 
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.glow-card {
+  box-shadow: var(--glow);
+  border: 1px solid var(--border);
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+.glow-card-lg {
+  box-shadow: var(--glow-lg);
+  border: 1px solid var(--border);
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 4s ease-in-out infinite;
+/* Horizontal progress bar animation for Hermes loading */
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
 }
 
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 8s ease infinite;
+.hermes-progress-bar {
+  overflow: hidden;
+  height: 2px;
+  background-color: var(--bg-subtle);
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.8s ease forwards;
+.hermes-progress-bar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 25%;
+  background-color: var(--accent-emerald);
+  animation: progress-slide 1.4s ease-in-out infinite;
 }
 
-/* Grid Pattern */
-.grid-pattern {
-  background-image: 
-    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
+/* Floating logo animation */
+@keyframes logo-float {
+  0%, 100% { transform: translateY(-12px); }
+  50% { transform: translateY(12px); }
 }
 
-/* Gradient Text */
-.gradient-text {
-  background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.4)); }
+  50% { filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.7)); }
 }
 
-/* Glass Card */
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.logo-float {
+  animation: logo-float 6s ease-in-out infinite, glow-pulse 6s ease-in-out infinite;
 }
 
-/* Glow Effects */
-.glow-emerald {
-  box-shadow: 0 0 60px rgba(16, 185, 129, 0.3);
+/* Nav active underline */
+.nav-link-active {
+  position: relative;
 }
 
-.glow-text {
-  text-shadow: 0 0 40px rgba(16, 185, 129, 0.5);
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent-emerald);
 }
