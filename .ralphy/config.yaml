@@ -1,0 +1,40 @@
+project:
+  name: cheggie-trade
+  description: "CHEGGIE TRADE — AI trading intelligence platform"
+  root: .
+
+boundaries:
+  protected:
+    - apps/backend/migrations/**
+    - .env*
+    - apps/web/.next/**
+    - uv.lock
+    - apps/web/pnpm-lock.yaml
+  workspaces:
+    - apps/web/
+    - apps/backend/
+    - services/api/
+    - tradingagents/
+    - skills/
+
+commands:
+  test: "python -m pytest tests/ -x -q 2>&1"
+  lint_py: "python -m ruff check tradingagents/ services/ 2>&1"
+  lint_ts: "cd apps/web && npm run lint 2>&1"
+  typecheck: "cd apps/web && npm run typecheck 2>&1"
+  build_web: "cd apps/web && npm run build 2>&1"
+
+task_format: PRD
+parallel_agents: true
+worktree_base: /tmp/cheggie-worktrees
+
+rules:
+  - "All new frontend components must use ct-* CSS variables. No hardcoded colors."
+  - "All API changes must update the corresponding Pydantic schema in services/api/app/schemas/."
+  - "Database schema changes go in numbered migration files under apps/backend/migrations/."
+  - "Every new feature needs a test that passes before marking complete."
+  - "Follow jCodeMunch exploration policy documented in CLAUDE.md."
+  - "Follow the Superpowers skills workflow. Check CLAUDE.md for which skill to invoke."
+  - "All new Python files must have type hints. All new TypeScript files must use strict types."
+  - "Commit format: feat(scope): description or fix(scope): description"
+  - "Never bypass pnpm frozen-lockfile. Run pnpm install locally and commit the lockfile."

@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "jcodemunch": {
+      "command": "uvx",
+      "args": ["jcodemunch-mcp"],
+      "autoApprove": ["mcp__jcodemunch__*"]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Glob|Grep)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'echo \"[CHEGGIE POLICY] Code exploration must use jCodeMunch MCP tools. See CLAUDE.md for the exploration policy.\" >&2; exit 1'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash -c 'which uvx >/dev/null 2>&1 && uvx jcodemunch-mcp init --repo . --yes 2>/dev/null || echo \"[INFO] jcodemunch init skipped (uvx not available)\"'"
+      }
+    ]
+  }
+}

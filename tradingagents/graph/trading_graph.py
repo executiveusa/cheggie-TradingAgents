@@ -153,24 +153,20 @@ class TradingAgentsGraph:
 
     def _create_tool_nodes(self) -> Dict[str, ToolNode]:
         """Create tool nodes for different data sources using abstract methods."""
-        return {
+        tool_nodes = {
             "market": ToolNode(
                 [
-                    # Core stock data tools
                     get_stock_data,
-                    # Technical indicators
                     get_indicators,
                 ]
             ),
             "social": ToolNode(
                 [
-                    # News tools for social media analysis
                     get_news,
                 ]
             ),
             "news": ToolNode(
                 [
-                    # News and insider information
                     get_news,
                     get_global_news,
                     get_insider_transactions,
@@ -178,7 +174,6 @@ class TradingAgentsGraph:
             ),
             "fundamentals": ToolNode(
                 [
-                    # Fundamental analysis tools
                     get_fundamentals,
                     get_balance_sheet,
                     get_cashflow,
@@ -186,6 +181,14 @@ class TradingAgentsGraph:
                 ]
             ),
         }
+
+        if self.config.get("skills_enabled"):
+            from tradingagents.skills.skill_tool_nodes import get_skill_tools
+            from tradingagents.skills.registry import SKILLS_REGISTRY
+            enabled = self.config.get("enabled_skills") or list(SKILLS_REGISTRY.keys())
+            tool_nodes["skills"] = ToolNode(get_skill_tools(enabled))
+
+        return tool_nodes
 
     def _fetch_returns(
         self, ticker: str, trade_date: str, holding_days: int = 5
