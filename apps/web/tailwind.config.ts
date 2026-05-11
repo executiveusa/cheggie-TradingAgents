@@ -5,36 +5,24 @@ const config: Config = {
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {
+      colors: {
+        'ct-bg': 'var(--ct-bg)',
+        'ct-card': 'var(--ct-card)',
+        'ct-emerald': 'var(--ct-emerald)',
+        'ct-emerald-dim': 'var(--ct-emerald-dim)',
+        'ct-text': 'var(--ct-text)',
+        'ct-muted': 'var(--ct-muted)',
+        'ct-border': 'var(--ct-border)',
+      },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
-      },
-      colors: {
-        // Emerald Tablet palette — dark mode
-        'bg-base': 'var(--bg-base)',
-        'bg-card': 'var(--bg-card)',
-        'bg-subtle': 'var(--bg-subtle)',
-        'accent-emerald': 'var(--accent-emerald)',
-        'accent-emerald-dim': 'var(--accent-emerald-dim)',
-        'accent-green-label': 'var(--accent-green-label)',
-        'text-primary': 'var(--text-primary)',
-        'text-secondary': 'var(--text-secondary)',
-        'border-emerald': 'var(--border)',
-        'code-green': 'var(--code-green)',
-      },
-      maxWidth: {
-        content: '1200px',
-      },
-      letterSpacing: {
-        label: '0.12em',
       },
     },
   },
   plugins: [],
 }
-
 export default config

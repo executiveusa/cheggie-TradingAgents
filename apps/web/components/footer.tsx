@@ -1,38 +1,25 @@
 import Link from 'next/link'
-import ThemeToggle from './theme-toggle'
 
-const NAV_LINKS = [
-  { label: 'Overview', href: '/' },
-  { label: 'Hermes', href: '/hermes' },
-  { label: 'Demo', href: '/demo' },
-  { label: 'Method', href: '/method' },
-  { label: 'Operator', href: '/operator' },
-]
+const links = ['Overview', 'Hermes', 'Demo', 'Method', 'Operator']
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--bg-base)] px-6 md:px-10 py-10">
-      <div className="max-w-content mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <nav className="flex flex-wrap gap-6" aria-label="Footer navigation">
-          {NAV_LINKS.map(({ label, href }) => (
+    <footer className="border-t border-[var(--ct-border)] bg-[var(--ct-bg)] px-6 py-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex flex-wrap gap-6 mb-4">
+          {links.map((l) => (
             <Link
-              key={href}
-              href={href}
-              className="font-sans text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              key={l}
+              href={l === 'Overview' ? '/' : `/${l.toLowerCase()}`}
+              className="text-sm text-[var(--ct-muted)] hover:text-[var(--ct-text)] transition-colors"
             >
-              {label}
+              {l}
             </Link>
           ))}
-        </nav>
-
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
         </div>
-      </div>
-
-      <div className="max-w-content mx-auto mt-8 pt-6 border-t border-[var(--border)]">
-        <p className="font-mono text-xs text-[var(--text-secondary)] tracking-wide">
-          Built by Cheggie Studios &copy; 2026. All rights reserved.
+        <p className="text-xs text-[var(--ct-muted)]">
+          Built by Cheggie Studios © 2026. All rights reserved.{' '}
+          <span className="opacity-60">Research software, not financial advice.</span>
         </p>
       </div>
     </footer>
