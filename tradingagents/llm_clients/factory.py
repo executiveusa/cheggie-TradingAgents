@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from .base_client import BaseLLMClient
@@ -6,6 +7,10 @@ from .base_client import BaseLLMClient
 _OPENAI_COMPATIBLE = (
     "openai", "xai", "deepseek", "qwen", "glm", "ollama", "openrouter",
 )
+
+# Synthia Gateway — OpenAI-compatible proxy that routes by model name prefix
+_GATEWAY_BASE_URL = os.getenv("SYNTHIA_GATEWAY_URL", "http://localhost:3000/v1")
+_GATEWAY_API_KEY = os.getenv("GATEWAY_API_KEY", "gateway-passthrough")
 
 
 def create_llm_client(
@@ -33,6 +38,18 @@ def create_llm_client(
         ValueError: If provider is not supported
     """
     provider_lower = provider.lower()
+
+    # Synthia Gateway: OpenAI-compatible proxy — model name prefix selects upstream
+    # claude-* → Anthropic, gpt-* → OpenAI, llama/gemma → Groq, mistral-* → Mistral
+    if provider_lower == "gateway":
+        from .openai_client import OpenAIClient
+        return OpenAIClient(
+            model,
+            base_url or _GATEWAY_BASE_URL,
+            provider="openrouter",  # use the OpenRouter code path (no responses API)
+            api_key=_GATEWAY_API_KEY,
+            **kwargs,
+        )
 
     if provider_lower in _OPENAI_COMPATIBLE:
         from .openai_client import OpenAIClient

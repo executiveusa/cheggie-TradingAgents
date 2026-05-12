@@ -35,6 +35,12 @@ DEFAULT_CONFIG = {
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
     "max_recur_limit": 100,
+    # Synthia Gateway configuration
+    "synthia_gateway_url": os.getenv("SYNTHIA_GATEWAY_URL", "http://localhost:3000/v1"),
+    "gateway_api_key": os.getenv("GATEWAY_API_KEY", ""),
+    # Skills configuration
+    "skills_enabled": False,
+    "enabled_skills": [],
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {

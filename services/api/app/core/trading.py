@@ -1,24 +1,82 @@
+"""Core trading analysis logic — bridges the FastAPI layer to TradingAgentsGraph."""
+
+from __future__ import annotations
+
+import time
+from typing import Optional
+
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 
+from .route_mapping import apply_route
 
-def run_analysis(ticker: str, trade_date: str) -> dict:
-    config = DEFAULT_CONFIG.copy()
+
+def _derive_risk(decision_text: str, recommendation: str) -> str:
+    lowered = decision_text.lower()
+    if "sell" in lowered or recommendation == "sell":
+        return "HIGH"
+    if "buy" in lowered or recommendation == "buy":
+        return "MEDIUM"
+    return "LOW"
+
+
+def _extract_hedge(decision_text: str) -> str:
+    for line in decision_text.splitlines():
+        line = line.strip()
+        if any(kw in line.lower() for kw in ("hedge", "stop", "put", "size down", "reduce", "protective")):
+            return line.lstrip("*-# ") or line
+    return "No specific hedge path identified in this analysis."
+
+
+def _model_note(config: dict, tokens: int, elapsed_ms: int) -> str:
+    provider = config.get("llm_provider", "openai")
+    model = config.get("quick_think_llm", "unknown")
+    return f"{provider} → {model} | {tokens} tokens | {elapsed_ms / 1000:.1f}s"
+
+
+def run_analysis(
+    ticker: str,
+    trade_date: str,
+    route: str = "auto",
+    size: Optional[str] = None,
+    catalyst: Optional[str] = None,
+    downside: Optional[str] = None,
+    skills: Optional[list[str]] = None,
+) -> dict:
+    config = apply_route(DEFAULT_CONFIG.copy(), route)
     config["max_debate_rounds"] = 1
+    config["max_risk_discuss_rounds"] = 1
+    if skills:
+        config["skills_enabled"] = True
+        config["enabled_skills"] = skills
+
+    t0 = time.time()
     graph = TradingAgentsGraph(debug=False, config=config)
     _, decision = graph.propagate(ticker, trade_date)
-    decision_text = str(decision)
+    elapsed_ms = int((time.time() - t0) * 1000)
 
-    recommendation = "hold"
+    decision_text = str(decision)
     lowered = decision_text.lower()
+    recommendation = "hold"
     if "buy" in lowered:
         recommendation = "buy"
     elif "sell" in lowered:
         recommendation = "sell"
 
+    risk = _derive_risk(decision_text, recommendation)
+    hedge = _extract_hedge(decision_text)
+    catalyst_read = decision_text[:400].strip() if decision_text else "Analysis complete."
+    tokens = 0
+
     return {
-        "analysis_summary": decision_text[:500],
+        "ticker": ticker,
+        "risk": risk,
+        "catalyst": catalyst_read,
+        "hedge": hedge,
+        "model_note": _model_note(config, tokens, elapsed_ms),
+        "tokens": tokens,
+        "time_ms": elapsed_ms,
+        "mode": "live",
         "recommendation": recommendation,
-        "confidence": 0.5,
-        "raw_decision": decision_text,
+        "skills_used": skills or [],
     }
