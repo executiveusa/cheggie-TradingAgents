@@ -3,7 +3,16 @@
     "jcodemunch": {
       "command": "uvx",
       "args": ["jcodemunch-mcp"],
-      "autoApprove": ["mcp__jcodemunch__*"]
+      "autoApprove": [
+        "mcp__jcodemunch__search_symbols",
+        "mcp__jcodemunch__get_symbol_source",
+        "mcp__jcodemunch__get_file_outline",
+        "mcp__jcodemunch__get_repo_outline",
+        "mcp__jcodemunch__find_references",
+        "mcp__jcodemunch__get_blast_radius",
+        "mcp__jcodemunch__get_call_hierarchy",
+        "mcp__jcodemunch__plan_turn"
+      ]
     }
   },
   "hooks": {
@@ -21,7 +30,7 @@
     "SessionStart": [
       {
         "type": "command",
-        "command": "bash -c 'which uvx >/dev/null 2>&1 && uvx jcodemunch-mcp init --repo . --yes 2>/dev/null || echo \"[INFO] jcodemunch init skipped (uvx not available)\"'"
+        "command": "if which uvx >/dev/null 2>&1; then uvx jcodemunch-mcp init --repo . --yes 2>&1 && echo '[SUCCESS] jcodemunch init completed' || echo '[ERROR] jcodemunch init failed'; else echo '[INFO] jcodemunch init skipped (uvx not available)'; fi"
       }
     ]
   }

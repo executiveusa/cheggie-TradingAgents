@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 ROUTE_TO_CONFIG: dict[str, dict] = {
     # auto: use whatever DEFAULT_CONFIG specifies unchanged
     "auto": {},
@@ -42,4 +46,6 @@ ROUTE_TO_CONFIG: dict[str, dict] = {
 def apply_route(config: dict, route: str) -> dict:
     """Return a copy of config with route-specific overrides applied."""
     overrides = ROUTE_TO_CONFIG.get(route, {})
+    if route not in ROUTE_TO_CONFIG:
+        logger.warning(f"Unknown route '{route}'; known routes: {list(ROUTE_TO_CONFIG.keys())}")
     return {**config, **overrides}

@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import yfinance as yf
 
 from .mock_data import get_ticker_info
 from .registry import register_skill
+
+logger = logging.getLogger(__name__)
 
 
 @register_skill("/portfolio-review")
@@ -30,9 +33,13 @@ def portfolio_review(
     for sym in all_tickers:
         try:
             info = yf.Ticker(sym).info or {}
-            weight = 100.0 if sym == ticker.upper() else next(
-                (p.get("weight_pct", 0) for p in (positions or []) if p.get("ticker", "").upper() == sym), 0
-            )
+            # Apply anchor weight only if no positions list was provided
+            if positions is None or len(positions) == 0:
+                weight = 100.0 if sym == ticker.upper() else 0
+            else:
+                weight = next(
+                    (p.get("weight_pct", 0) for p in positions if p.get("ticker", "").upper() == sym), 0
+                )
             position_snapshots.append({
                 "ticker": sym,
                 "weight_pct": weight,
@@ -43,8 +50,12 @@ def portfolio_review(
                 "52w_low": info.get("fiftyTwoWeekLow"),
                 "52w_change_pct": info.get("52WeekChange"),
             })
-        except Exception:
-            position_snapshots.append({"ticker": sym, "error": "data_unavailable"})
+        except (KeyError, IndexError, ValueError) as e:
+            logger.warning(f"Failed to fetch data for {sym}: {type(e).__name__}: {e}")
+            position_snapshots.append({"ticker": sym, "error": "data_unavailable", "error_type": type(e).__name__})
+        except Exception as e:
+            logger.error(f"Unexpected error fetching data for {sym}: {type(e).__name__}: {e}")
+            position_snapshots.append({"ticker": sym, "error": "data_unavailable", "error_type": type(e).__name__})
 
     # Concentration check
     weights = [p.get("weight_pct", 0) for p in position_snapshots]
