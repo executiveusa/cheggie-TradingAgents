@@ -7,7 +7,6 @@ from typing import Any
 
 import yfinance as yf
 
-from .mock_data import get_ticker_info
 from .registry import register_skill
 
 logger = logging.getLogger(__name__)
@@ -17,29 +16,32 @@ logger = logging.getLogger(__name__)
 def portfolio_review(
     ticker: str,
     positions: list[dict] | None = None,
+    concentration_threshold: float = 20.0,
     **kwargs,
 ) -> dict[str, Any]:
     """Multi-position portfolio review against a single anchor ticker.
 
     positions: list of {"ticker": str, "weight_pct": float}
     """
-    anchor = get_ticker_info(ticker)
     position_snapshots = []
 
-    all_tickers = [ticker.upper()]
+    anchor_sym = ticker.upper()
+    all_tickers = [anchor_sym]
     if positions:
-        all_tickers += [p["ticker"].upper() for p in positions if p.get("ticker") != ticker]
+        all_tickers += [
+            sym
+            for p in positions
+            for sym in [str(p.get("ticker", "")).upper()]
+            if sym and sym != anchor_sym
+        ]
 
     for sym in all_tickers:
         try:
             info = yf.Ticker(sym).info or {}
-            # Apply anchor weight only if no positions list was provided
-            if positions is None or len(positions) == 0:
-                weight = 100.0 if sym == ticker.upper() else 0
-            else:
-                weight = next(
-                    (p.get("weight_pct", 0) for p in positions if p.get("ticker", "").upper() == sym), 0
-                )
+            weight = next(
+                (p.get("weight_pct", 0) for p in (positions or []) if p.get("ticker", "").upper() == sym),
+                100.0 if not positions and sym == ticker.upper() else 0.0,
+            )
             position_snapshots.append({
                 "ticker": sym,
                 "weight_pct": weight,
@@ -50,17 +52,14 @@ def portfolio_review(
                 "52w_low": info.get("fiftyTwoWeekLow"),
                 "52w_change_pct": info.get("52WeekChange"),
             })
-        except (KeyError, IndexError, ValueError) as e:
-            logger.warning(f"Failed to fetch data for {sym}: {type(e).__name__}: {e}")
-            position_snapshots.append({"ticker": sym, "error": "data_unavailable", "error_type": type(e).__name__})
-        except Exception as e:
-            logger.error(f"Unexpected error fetching data for {sym}: {type(e).__name__}: {e}")
-            position_snapshots.append({"ticker": sym, "error": "data_unavailable", "error_type": type(e).__name__})
+        except Exception as exc:
+            logger.debug("Could not fetch data for %s: %s", sym, exc)
+            position_snapshots.append({"ticker": sym, "error": "data_unavailable", "error_type": type(exc).__name__})
 
     # Concentration check
     weights = [p.get("weight_pct", 0) for p in position_snapshots]
     max_weight = max(weights) if weights else 0
-    concentration_flag = max_weight > 20
+    concentration_flag = max_weight > concentration_threshold
 
     return {
         "skill": "/portfolio-review",
@@ -77,14 +76,25 @@ def rebalancing(
     ticker: str,
     current_positions: list[dict] | None = None,
     target_positions: list[dict] | None = None,
+    drift_threshold: float = 1.0,
     **kwargs,
 ) -> dict[str, Any]:
     """Drift detection and rebalancing trades needed.
 
     current_positions / target_positions: list of {"ticker": str, "weight_pct": float}
     """
-    current_map = {p["ticker"].upper(): p.get("weight_pct", 0) for p in (current_positions or [])}
-    target_map = {p["ticker"].upper(): p.get("weight_pct", 0) for p in (target_positions or [])}
+    current_map = {
+        sym: p.get("weight_pct", 0)
+        for p in (current_positions or [])
+        for sym in [str(p.get("ticker", "")).upper()]
+        if sym
+    }
+    target_map = {
+        sym: p.get("weight_pct", 0)
+        for p in (target_positions or [])
+        for sym in [str(p.get("ticker", "")).upper()]
+        if sym
+    }
 
     all_symbols = set(current_map) | set(target_map)
     trades = []
@@ -92,7 +102,7 @@ def rebalancing(
         current_w = current_map.get(sym, 0.0)
         target_w = target_map.get(sym, 0.0)
         drift = current_w - target_w
-        if abs(drift) >= 1.0:
+        if abs(drift) >= drift_threshold:
             trades.append({
                 "ticker": sym,
                 "current_weight_pct": current_w,

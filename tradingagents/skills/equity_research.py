@@ -26,13 +26,13 @@ def earnings_analysis(ticker: str, **kwargs) -> dict[str, Any]:
         cal = t.calendar
         if cal is not None and "Earnings Date" in cal:
             earnings_dates = str(cal["Earnings Date"])
-    except Exception as e:
-        logger.warning(f"Failed to read calendar for {ticker}: {type(e).__name__}: {e}")
+    except Exception as exc:
+        logger.debug("Could not read calendar for %s: %s", ticker, exc)
 
     eps_trailing = info.get("trailingEps")
     eps_forward = info.get("forwardEps")
     eps_growth = None
-    if eps_trailing and eps_forward and eps_trailing != 0:
+    if eps_trailing is not None and eps_forward is not None and eps_trailing != 0:
         eps_growth = round((eps_forward - eps_trailing) / abs(eps_trailing) * 100, 1)
 
     revenue_growth = info.get("revenueGrowth")
@@ -50,8 +50,8 @@ def earnings_analysis(ticker: str, **kwargs) -> dict[str, Any]:
                     "quarter": str(row.get("Quarter", "")),
                     "surprise_pct": round(float(row.get("Surprise(%)", 0)), 1),
                 })
-    except Exception as e:
-        logger.warning(f"Failed to parse earnings history for {ticker}: {type(e).__name__}: {e}")
+    except Exception as exc:
+        logger.debug("Could not read earnings_history for %s: %s", ticker, exc)
 
     return {
         "skill": "/earnings-analysis",
@@ -85,8 +85,8 @@ def sector_overview(ticker: str, **kwargs) -> dict[str, Any]:
                 "gross_margin": p_info.get("grossMargins"),
                 "market_cap": p_info.get("marketCap"),
             })
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Could not fetch peer data for %s: %s", peer, exc)
 
     return {
         "skill": "/sector-overview",
@@ -108,34 +108,32 @@ def thesis_tracking(ticker: str, memory_log_path: str | None = None, **kwargs) -
     import os
     import re
 
-    # Validate memory_log_path to prevent directory traversal attacks
-    base_dir = os.path.join(os.path.expanduser("~"), ".tradingagents", "memory")
+    default_path = os.path.join(
+        os.path.expanduser("~"), ".tradingagents", "memory", "trading_memory.md"
+    )
+    allowed_root = os.path.realpath(os.path.dirname(default_path))
     if memory_log_path:
-        candidate_path = os.path.abspath(os.path.normpath(memory_log_path))
-        if not candidate_path.startswith(base_dir):
-            logger.warning(f"Rejecting memory_log_path outside base directory: {memory_log_path}")
-            log_path = os.path.join(base_dir, "trading_memory.md")
-        else:
-            log_path = candidate_path
+        resolved = os.path.realpath(memory_log_path)
+        log_path = resolved if resolved.startswith(allowed_root + os.sep) else default_path
     else:
-        log_path = os.path.join(base_dir, "trading_memory.md")
+        log_path = default_path
 
     entries: list[dict] = []
-    if os.path.exists(log_path):
-        try:
-            with open(log_path, "r") as f:
-                content = f.read()
-            # Parse entries matching this ticker
-            pattern = rf"## {re.escape(ticker.upper())}.*?(?=\n## |\Z)"
-            for match in re.finditer(pattern, content, re.DOTALL):
-                entries.append({"raw": match.group().strip()})
-        except Exception as e:
-            logger.error(f"Failed to read memory log {log_path}: {type(e).__name__}: {e}")
+    content = ""
+    if os.path.isfile(log_path):
+        with open(log_path, encoding="utf-8") as f:
+            content = f.read()
+    elif os.path.exists(log_path):
+        logger.warning("memory log path exists but is not a file: %s", log_path)
+    # Parse entries matching this ticker
+    pattern = rf"## {re.escape(ticker.upper())}.*?(?=\n## |\Z)"
+    for match in re.finditer(pattern, content, re.DOTALL):
+        entries.append({"raw": match.group().strip()})
 
     return {
         "skill": "/thesis-tracking",
         "ticker": ticker.upper(),
         "prior_entries": len(entries),
-        "entries": entries[:5],  # cap at 5 most recent
+        "entries": list(reversed(entries[-5:])),
         "data_source": "memory_log",
     }

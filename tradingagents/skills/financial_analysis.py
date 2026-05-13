@@ -6,9 +6,12 @@ All outputs include data_source annotation so users know the data tier.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import yfinance as yf
+
+logger = logging.getLogger(__name__)
 
 from .mock_data import get_ticker_info, get_cashflow, get_sector_peers
 from .registry import register_skill
@@ -35,7 +38,8 @@ def comps_analysis(ticker: str, peers: list[str] | None = None, **kwargs) -> dic
                 "revenue_growth": info.get("revenueGrowth"),
                 "gross_margins": info.get("grossMargins"),
             })
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to fetch comps data for %s: %s", sym, exc)
             rows.append({"ticker": sym, "error": "data_unavailable"})
 
     return {
@@ -57,26 +61,22 @@ def dcf_model(
     **kwargs,
 ) -> dict[str, Any]:
     """DCF valuation using yfinance free cashflow data."""
-    # Validate assumptions to prevent divide-by-zero
-    if wacc <= terminal_growth:
-        return {
-            "skill": "/dcf",
-            "ticker": ticker.upper(),
-            "error": "wacc_not_greater_than_terminal_growth",
-            "data_source": "yfinance",
-        }
     if projection_years <= 0:
-        return {
-            "skill": "/dcf",
-            "ticker": ticker.upper(),
-            "error": "projection_years_must_be_positive",
-            "data_source": "yfinance",
-        }
+        return {"skill": "/dcf", "ticker": ticker.upper(), "error": "invalid_projection_years", "data_source": "yfinance"}
+    if wacc <= terminal_growth:
+        return {"skill": "/dcf", "ticker": ticker.upper(), "error": "invalid_discount_assumptions", "data_source": "yfinance"}
 
     cf_data = get_cashflow(ticker)
     info = get_ticker_info(ticker)
 
-    shares = info.get("sharesOutstanding", 0) or 1
+    shares = info.get("sharesOutstanding")
+    if not shares or shares <= 0:
+        return {
+            "skill": "/dcf",
+            "ticker": ticker.upper(),
+            "error": "missing_shares_outstanding",
+            "data_source": "yfinance",
+        }
     current_price = info.get("currentPrice") or info.get("regularMarketPrice", 0)
 
     # Pull historical free cash flows (most recent 4 years)
@@ -109,7 +109,7 @@ def dcf_model(
     terminal_pv = terminal_value / (1 + wacc) ** projection_years
 
     intrinsic_total = sum(discounted) + terminal_pv
-    intrinsic_per_share = intrinsic_total / shares if shares else 0
+    intrinsic_per_share = intrinsic_total / shares
     upside_pct = ((intrinsic_per_share - current_price) / current_price * 100) if current_price else None
 
     return {
@@ -132,15 +132,8 @@ def dcf_model(
 @register_skill("/lbo")
 def lbo_model(ticker: str, target_irr: float = 0.20, hold_years: int = 5, **kwargs) -> dict[str, Any]:
     """Simplified LBO model using yfinance balance sheet and EBITDA data."""
-    # Validate hold_years to prevent divide-by-zero
     if hold_years <= 0:
-        return {
-            "skill": "/lbo",
-            "ticker": ticker.upper(),
-            "error": "hold_years_must_be_positive",
-            "data_source": "yfinance",
-        }
-
+        raise ValueError("hold_years must be > 0")
     info = get_ticker_info(ticker)
 
     ebitda = info.get("ebitda", 0) or 0
