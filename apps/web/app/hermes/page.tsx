@@ -169,11 +169,7 @@ export default function HermesPage() {
           <section className="mt-8">
             <p className="font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase mb-3">Route preference</p>
             <div className="flex flex-wrap gap-2">
-<<<<<<< HEAD
               {(['auto', 'gateway', 'grok', 'groq', 'openrouter', 'gemini'] as RoutePreference[]).map((r) => (
-=======
-              {(['auto', 'grok', 'groq', 'openrouter', 'gemini'] as RoutePreference[]).map((r) => (
->>>>>>> origin/main
                 <button
                   key={r}
                   onClick={() => setRoute(r)}
