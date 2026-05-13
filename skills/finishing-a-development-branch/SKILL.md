@@ -20,13 +20,13 @@ Review every changed file. Is anything unexpected in the diff?
 
 ### Step 3 — Write the commit message
 Format:
-```
+```text
 feat(scope): one-line summary of what changed
 
 - Bullet point for each significant change
 - Reference to any related issues or PRs
 
-https://claude.ai/code/session_01MXrTEstEz1h2uXMZHLvoZA
+https://claude.ai/code/session_<your-session-id>
 ```
 
 ### Step 4 — Final build check

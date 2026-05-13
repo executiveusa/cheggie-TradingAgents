@@ -186,6 +186,13 @@ class TradingAgentsGraph:
             from tradingagents.skills.skill_tool_nodes import get_skill_tools
             from tradingagents.skills.registry import SKILLS_REGISTRY
             enabled = self.config.get("enabled_skills") or list(SKILLS_REGISTRY.keys())
+            # Validate enabled_skills against registry
+            if enabled:
+                invalid_skills = [s for s in enabled if s not in SKILLS_REGISTRY]
+                if invalid_skills:
+                    logger.warning(f"Unknown skills requested: {invalid_skills}; known skills: {list(SKILLS_REGISTRY.keys())}")
+                    # Filter to only valid skills
+                    enabled = [s for s in enabled if s in SKILLS_REGISTRY]
             tool_nodes["skills"] = ToolNode(get_skill_tools(enabled))
 
         return tool_nodes

@@ -15,12 +15,12 @@ def unit_economics(ticker: str, **kwargs) -> dict[str, Any]:
     income = get_income_statement(ticker)
 
     revenue = info.get("totalRevenue", 0) or 0
-    employees = info.get("fullTimeEmployees", 0) or 1
+    employees = info.get("fullTimeEmployees") or None
     gross_margin = info.get("grossMargins", 0) or 0
     operating_margin = info.get("operatingMargins", 0) or 0
     revenue_growth = info.get("revenueGrowth", 0) or 0
 
-    rev_per_employee = revenue / employees if employees else None
+    rev_per_employee = revenue / employees if employees and employees > 0 else None
 
     rows = income.get("rows", [])
     rev_history: list[float] = []

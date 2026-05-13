@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import yfinance as yf
 
 from .mock_data import get_ticker_info, get_income_statement
 from .registry import register_skill
+
+logger = logging.getLogger(__name__)
 
 
 @register_skill("/earnings-analysis")
@@ -23,8 +26,8 @@ def earnings_analysis(ticker: str, **kwargs) -> dict[str, Any]:
         cal = t.calendar
         if cal is not None and "Earnings Date" in cal:
             earnings_dates = str(cal["Earnings Date"])
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to read calendar for {ticker}: {type(e).__name__}: {e}")
 
     eps_trailing = info.get("trailingEps")
     eps_forward = info.get("forwardEps")
@@ -47,8 +50,8 @@ def earnings_analysis(ticker: str, **kwargs) -> dict[str, Any]:
                     "quarter": str(row.get("Quarter", "")),
                     "surprise_pct": round(float(row.get("Surprise(%)", 0)), 1),
                 })
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to parse earnings history for {ticker}: {type(e).__name__}: {e}")
 
     return {
         "skill": "/earnings-analysis",
@@ -105,17 +108,29 @@ def thesis_tracking(ticker: str, memory_log_path: str | None = None, **kwargs) -
     import os
     import re
 
-    log_path = memory_log_path or os.path.join(
-        os.path.expanduser("~"), ".tradingagents", "memory", "trading_memory.md"
-    )
+    # Validate memory_log_path to prevent directory traversal attacks
+    base_dir = os.path.join(os.path.expanduser("~"), ".tradingagents", "memory")
+    if memory_log_path:
+        candidate_path = os.path.abspath(os.path.normpath(memory_log_path))
+        if not candidate_path.startswith(base_dir):
+            logger.warning(f"Rejecting memory_log_path outside base directory: {memory_log_path}")
+            log_path = os.path.join(base_dir, "trading_memory.md")
+        else:
+            log_path = candidate_path
+    else:
+        log_path = os.path.join(base_dir, "trading_memory.md")
 
     entries: list[dict] = []
     if os.path.exists(log_path):
-        content = open(log_path).read()
-        # Parse entries matching this ticker
-        pattern = rf"## {re.escape(ticker.upper())}.*?(?=\n## |\Z)"
-        for match in re.finditer(pattern, content, re.DOTALL):
-            entries.append({"raw": match.group().strip()})
+        try:
+            with open(log_path, "r") as f:
+                content = f.read()
+            # Parse entries matching this ticker
+            pattern = rf"## {re.escape(ticker.upper())}.*?(?=\n## |\Z)"
+            for match in re.finditer(pattern, content, re.DOTALL):
+                entries.append({"raw": match.group().strip()})
+        except Exception as e:
+            logger.error(f"Failed to read memory log {log_path}: {type(e).__name__}: {e}")
 
     return {
         "skill": "/thesis-tracking",

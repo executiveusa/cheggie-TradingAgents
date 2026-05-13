@@ -16,7 +16,7 @@ def analyze(payload: AnalyzeRequest) -> dict:
             size=payload.size,
             catalyst=payload.catalyst,
             downside=payload.downside,
-            skills=payload.skills or [],
+            skills=payload.skills,
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"analysis_failed: {exc}") from exc

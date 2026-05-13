@@ -60,7 +60,7 @@ All new components must use ct-* CSS variables. No hardcoded colors.
 
 ### Component patterns
 
-```
+```text
 Card:        rounded-2xl border border-[var(--ct-border)] bg-[var(--ct-card)] p-8
 Label:       font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase
 CTA button:  rounded-xl bg-[var(--ct-emerald)] px-6 py-3 font-semibold text-black

@@ -57,6 +57,22 @@ def dcf_model(
     **kwargs,
 ) -> dict[str, Any]:
     """DCF valuation using yfinance free cashflow data."""
+    # Validate assumptions to prevent divide-by-zero
+    if wacc <= terminal_growth:
+        return {
+            "skill": "/dcf",
+            "ticker": ticker.upper(),
+            "error": "wacc_not_greater_than_terminal_growth",
+            "data_source": "yfinance",
+        }
+    if projection_years <= 0:
+        return {
+            "skill": "/dcf",
+            "ticker": ticker.upper(),
+            "error": "projection_years_must_be_positive",
+            "data_source": "yfinance",
+        }
+
     cf_data = get_cashflow(ticker)
     info = get_ticker_info(ticker)
 
@@ -116,6 +132,15 @@ def dcf_model(
 @register_skill("/lbo")
 def lbo_model(ticker: str, target_irr: float = 0.20, hold_years: int = 5, **kwargs) -> dict[str, Any]:
     """Simplified LBO model using yfinance balance sheet and EBITDA data."""
+    # Validate hold_years to prevent divide-by-zero
+    if hold_years <= 0:
+        return {
+            "skill": "/lbo",
+            "ticker": ticker.upper(),
+            "error": "hold_years_must_be_positive",
+            "data_source": "yfinance",
+        }
+
     info = get_ticker_info(ticker)
 
     ebitda = info.get("ebitda", 0) or 0
