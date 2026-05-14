@@ -48,15 +48,16 @@ function AnalyzeForm() {
     if (sym) setTicker(sym.toUpperCase())
   }, [searchParams])
 
-  async function handleBrief() {
+  async function handleBrief(downsideOverride?: string) {
     if (!ticker.trim()) return
     setLoading(true)
     const start = Date.now()
+    const effectiveDownside = downsideOverride !== undefined ? downsideOverride : downside
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker, size, catalyst, downside, route }),
+        body: JSON.stringify({ ticker, size, catalyst, downside: effectiveDownside, route }),
       })
       const data = await res.json()
       const record: Brief = { ...data, timestamp: new Date().toLocaleTimeString() }
@@ -177,7 +178,7 @@ function AnalyzeForm() {
           />
 
           <button
-            onClick={handleBrief}
+            onClick={() => handleBrief()}
             disabled={loading || !ticker.trim()}
             className="w-full rounded-xl bg-[var(--accent)] py-3 font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -298,9 +299,10 @@ function AnalyzeForm() {
               onChange={(e) => setFollowUp(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey && followUp.trim() && ticker) {
-                  setDownside(followUp)
+                  const text = followUp
+                  setDownside(text)
                   setFollowUp('')
-                  handleBrief()
+                  handleBrief(text)
                 }
               }}
               placeholder={tr(t.analyze.followUp, lang)}
@@ -309,9 +311,10 @@ function AnalyzeForm() {
             <button
               onClick={() => {
                 if (!followUp.trim() || !ticker) return
-                setDownside(followUp)
+                const text = followUp
+                setDownside(text)
                 setFollowUp('')
-                handleBrief()
+                handleBrief(text)
               }}
               disabled={loading || !followUp.trim()}
               className="rounded-xl bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
