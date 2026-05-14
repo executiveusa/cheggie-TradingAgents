@@ -1,270 +1,265 @@
 'use client'
 
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ChessKnightSVG } from '@/lib/logo'
-import { wordReveal, fadeUp, staggerContainer, slideInRight, cardEntrance } from '@/lib/animations'
+import { CTLogo } from '@/lib/logo'
+import { useLanguage } from '@/lib/language-context'
+import { t, tr } from '@/lib/i18n'
 
-function WordReveal({ text, className }: { text: string; className?: string }) {
-  const words = text.split(' ')
-  return (
-    <motion.span
-      className={className}
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
-    >
-      {words.map((word, i) => (
-        <motion.span
-          key={i}
-          className="inline-block mr-[0.25em]"
-          variants={wordReveal}
-          custom={i}
-        >
-          {word}
-        </motion.span>
-      ))}
-    </motion.span>
-  )
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 }
 
-function AnimCard({ children, i = 0 }: { children: React.ReactNode; i?: number }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+}
+
+function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <motion.div
-      ref={ref}
-      variants={cardEntrance}
-      custom={i}
-      initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
-      className="rounded-2xl border border-[var(--ct-border)] bg-[var(--ct-card)] p-8"
+      variants={fadeUp}
+      className={`rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 ${className}`}
     >
       {children}
     </motion.div>
   )
 }
 
-function StoryStep({ num, title, body, i }: { num: string; title: string; body: string; i: number }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
-  return (
-    <motion.div
-      ref={ref}
-      variants={slideInRight}
-      initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
-      transition={{ delay: i * 0.1 }}
-      className="rounded-2xl border border-[var(--ct-border)] bg-[var(--ct-card)] p-8"
-    >
-      <p className="font-mono text-xs text-[var(--ct-emerald)] mb-3 tracking-widest">{num}</p>
-      <h3 className="text-xl font-bold text-[var(--ct-text)] mb-3">{title}</h3>
-      <p className="text-[var(--ct-muted)] leading-relaxed">{body}</p>
-    </motion.div>
-  )
-}
-
 export default function Home() {
-  const heroRef = useRef(null)
+  const { lang } = useLanguage()
 
   return (
-    <div className="bg-[var(--ct-bg)]">
+    <div className="bg-[var(--bg)] bg-grid">
 
-      {/* ── HERO ── */}
-      <section className="mx-auto max-w-6xl px-6 pt-24 pb-20">
-        <div className="grid lg:grid-cols-[3fr_2fr] gap-12 items-start">
-
-          {/* Left */}
+      {/* HERO */}
+      <section className="mx-auto max-w-7xl px-6 pt-24 pb-20">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="grid lg:grid-cols-[3fr_2fr] gap-16 items-start"
+        >
           <div>
-            <p className="font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase mb-6">
-              CHEGGIE TRADE
-            </p>
-            <h1 ref={heroRef} className="text-6xl lg:text-8xl font-bold leading-[0.92] tracking-tight text-[var(--ct-text)] mb-8">
-              <WordReveal text="A market desk built for the trader who still wants the why." />
-            </h1>
-            <motion.p
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.8 }}
-              className="text-lg text-[var(--ct-muted)] mb-10 max-w-lg leading-relaxed"
-            >
-              CHEGGIE TRADE gives you one place to brief a setup, route across live models, and read an answer that sounds like a sharp operator instead of a hype bot.
+            <motion.p variants={fadeUp} className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase mb-6">
+              {tr(t.home.eyebrow, lang)}
             </motion.p>
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              transition={{ delayChildren: 1 }}
-              className="flex flex-wrap gap-4 mb-12"
+            <motion.h1
+              variants={fadeUp}
+              className="text-5xl lg:text-7xl font-bold leading-[1.0] tracking-tight text-[var(--text)] mb-8"
             >
-              <Link href="/hermes"
-                className="rounded-xl bg-[var(--ct-emerald)] px-6 py-3 font-semibold text-black hover:bg-[var(--ct-emerald-dim)] transition-colors">
-                Open Hermes
+              {tr(t.home.hero, lang)}
+            </motion.h1>
+            <motion.p variants={fadeUp} className="text-lg text-[var(--muted)] mb-10 max-w-xl leading-relaxed">
+              {tr(t.home.heroSub, lang)}
+            </motion.p>
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-16">
+              <Link
+                href="/analyze"
+                className="rounded-xl bg-[var(--accent)] px-6 py-3 font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors"
+              >
+                {tr(t.home.ctaPrimary, lang)}
               </Link>
-              <Link href="/demo"
-                className="rounded-xl border border-[var(--ct-border)] px-6 py-3 font-semibold text-[var(--ct-text)] hover:border-[var(--ct-emerald)] transition-colors">
-                Run live demo
+              <Link
+                href="/demo"
+                className="rounded-xl border border-[var(--border)] px-6 py-3 font-semibold text-[var(--text)] hover:border-[var(--accent)] transition-colors"
+              >
+                {tr(t.home.ctaSecondary, lang)}
               </Link>
-              <Link href="/method"
-                className="px-6 py-3 text-[var(--ct-muted)] hover:text-[var(--ct-text)] underline-offset-4 hover:underline transition-colors">
-                See the method
+              <Link
+                href="/method"
+                className="px-6 py-3 text-[var(--muted)] hover:text-[var(--text)] underline-offset-4 hover:underline transition-colors"
+              >
+                {tr(t.home.ctaTertiary, lang)}
               </Link>
             </motion.div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { stat: '6 lanes', desc: 'xAI, Groq, OpenRouter, Gemini, gateway, backend' },
-                { stat: '1 audit', desc: 'Every answer reports the route that produced it' },
-                { stat: 'Lean pack', desc: 'Session context is compressed before it hits the model' },
-              ].map((s, i) => (
-                <AnimCard key={s.stat} i={i}>
-                  <p className="text-2xl font-bold text-[var(--ct-text)] mb-1">{s.stat}</p>
-                  <p className="text-xs text-[var(--ct-muted)]">{s.desc}</p>
-                </AnimCard>
+            <motion.div variants={stagger} className="grid grid-cols-3 gap-4">
+              {t.home.stats.map((s, i) => (
+                <Card key={i}>
+                  <p className="text-2xl font-bold text-[var(--text)] mb-1 font-mono">{tr(s.stat, lang)}</p>
+                  <p className="text-xs text-[var(--muted)] leading-relaxed">{tr(s.desc, lang)}</p>
+                </Card>
               ))}
-            </div>
+            </motion.div>
           </div>
 
-          {/* Right — Live desk preview card */}
+          {/* Right preview card */}
           <motion.div
             variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.4 }}
-            className="rounded-3xl border border-[var(--ct-border)] bg-[var(--ct-card)] p-8 sticky top-24"
+            className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-8 sticky top-24"
           >
             <div className="flex items-center gap-3 mb-6">
-              <ChessKnightSVG className="h-10 w-10 text-[var(--ct-emerald)]" />
-              <p className="font-mono text-xs tracking-widest text-[var(--ct-emerald)] uppercase">CHEGGIE TRADE</p>
+              <CTLogo className="h-9 w-9 text-[var(--accent)] animate-glow" />
+              <span className="font-mono text-xs tracking-[0.18em] text-[var(--accent)] uppercase">CheggieTrade</span>
             </div>
-            <p className="font-mono text-xs text-[var(--ct-emerald)] mb-4">Live desk preview</p>
-            <p className="text-2xl font-bold text-[var(--ct-text)] mb-8 leading-snug">
-              Hermes weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain.
+            <p className="font-mono text-xs text-[var(--accent)] mb-4 tracking-wider">
+              {lang === 'sr' ? 'Pregled živog deska' : 'Live desk preview'}
+            </p>
+            <p className="text-2xl font-bold text-[var(--text)] mb-8 leading-snug">
+              {lang === 'sr'
+                ? 'Hermes meri koncentraciju, likvidnost, rizik katalizatora i puteve zaštite pre nego što ikada zvuči sigurno.'
+                : 'Hermes weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain.'}
             </p>
 
             {[
-              { title: 'Grok first when configured', body: 'The desk can route through xAI and reuse a stable session id for better prompt-cache behavior.' },
-              { title: 'Groq for speed', body: 'Groq stays in the chain for fast reasoning when a compatible key is available.' },
-              { title: 'OpenRouter pinned to a free NVIDIA lane', body: 'The default OpenRouter model is a known NVIDIA free route so the product gets actual final-answer text instead of a drifting reasoning-only free model.' },
-              { title: 'Gemini, gateway, and backend safety net', body: 'The app keeps a truthful fallback path instead of failing silently when quotas or keys go bad.' },
+              {
+                title: lang === 'sr' ? 'Grok prvi kada je konfigurisan' : 'Grok first when configured',
+                body: lang === 'sr'
+                  ? 'Desk može da rutira kroz xAI i ponovo koristi stabilni session id za bolje ponašanje keširanje prompta.'
+                  : 'The desk can route through xAI and reuse a stable session id for better prompt-cache behavior.',
+              },
+              {
+                title: lang === 'sr' ? 'Groq za brzinu' : 'Groq for speed',
+                body: lang === 'sr'
+                  ? 'Groq ostaje u lancu za brzo rezonovanje kada je dostupan kompatibilan ključ.'
+                  : 'Groq stays in the chain for fast reasoning when a compatible key is available.',
+              },
+              {
+                title: lang === 'sr' ? 'OpenRouter zakačen za besplatnu NVIDIA liniju' : 'OpenRouter pinned to a free NVIDIA lane',
+                body: lang === 'sr'
+                  ? 'Podrazumevani OpenRouter model je poznata NVIDIA besplatna ruta.'
+                  : 'The default OpenRouter model is a known NVIDIA free route for actual final-answer text.',
+              },
             ].map((f) => (
-              <div key={f.title} className="border-l-2 border-[var(--ct-emerald)] pl-4 mb-5">
-                <p className="font-semibold text-[var(--ct-text)] text-sm mb-1">{f.title}</p>
-                <p className="text-xs text-[var(--ct-muted)] leading-relaxed">{f.body}</p>
+              <div key={f.title} className="border-l-2 border-[var(--accent)] pl-4 mb-5">
+                <p className="font-semibold text-[var(--text)] text-sm mb-1">{f.title}</p>
+                <p className="text-xs text-[var(--muted)] leading-relaxed">{f.body}</p>
               </div>
             ))}
 
-            <div className="mt-6 rounded-xl border border-[var(--ct-border)] bg-[var(--ct-subtle)] p-4">
-              <p className="font-mono text-xs text-[var(--ct-emerald)] mb-2">Sample market brief</p>
-              <p className="text-sm text-[var(--ct-muted)] leading-relaxed">
-                A 28% NVDA weight is now portfolio risk, not just single-name risk. Treat the earnings catalyst like an exposure event and size the hedge before you size the optimism.
+            <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--elevated)] p-4">
+              <p className="font-mono text-xs text-[var(--accent)] mb-2">
+                {lang === 'sr' ? 'Primer tržišnog brifinga' : 'Sample market brief'}
+              </p>
+              <p className="text-sm text-[var(--muted)] leading-relaxed">
+                {lang === 'sr'
+                  ? '28% težina NVDA je sada rizik portfolija, ne samo rizik jednog imena. Tretira katalizator zarade kao događaj ekspozicije i veliči zaštitu pre veličanja optimizma.'
+                  : 'A 28% NVDA weight is now portfolio risk, not just single-name risk. Treat the earnings catalyst like an exposure event and size the hedge before you size the optimism.'}
               </p>
             </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* PROBLEM */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase mb-10"
+        >
+          {tr(t.home.problemLabel, lang)}
+        </motion.p>
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          className="grid md:grid-cols-3 gap-6"
+        >
+          {t.home.problems.map((c, i) => (
+            <Card key={i}>
+              <h3 className="text-lg font-bold text-[var(--text)] mb-3 leading-snug">{tr(c.h, lang)}</h3>
+              <p className="text-sm text-[var(--muted)] leading-relaxed">{tr(c.b, lang)}</p>
+            </Card>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* SOLUTION / STEPS */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="grid lg:grid-cols-[2fr_3fr] gap-16">
+          <div className="lg:sticky lg:top-32 h-fit">
+            <p className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase mb-4">
+              {tr(t.home.solutionLabel, lang)}
+            </p>
+            <h2 className="text-4xl font-bold text-[var(--text)] leading-tight mb-4">
+              {tr(t.home.solutionTitle, lang)}
+            </h2>
+            <p className="text-[var(--muted)] leading-relaxed">
+              {tr(t.home.solutionSub, lang)}
+            </p>
+          </div>
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            className="flex flex-col gap-6"
+          >
+            {t.home.steps.map((s, i) => (
+              <Card key={i}>
+                <p className="font-mono text-xs text-[var(--accent)] mb-3 tracking-widest">{s.num}</p>
+                <h3 className="text-xl font-bold text-[var(--text)] mb-3">{tr(s.title, lang)}</h3>
+                <p className="text-[var(--muted)] leading-relaxed">{tr(s.body, lang)}</p>
+              </Card>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ── PAIN POINTS ── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { h: 'You do not need another fake oracle.', b: 'You need a desk that can explain concentration risk, invalidate bad sizing, and admit when the model route is degraded.' },
-            { h: 'Most retail tooling shows output, not reasoning.', b: 'CHEGGIE TRADE turns the answer into a readable market brief so the trader can challenge the thesis before acting.' },
-            { h: 'Token spend should go into judgment, not noise.', b: 'Hermes packs context, trims repeated memory, and keeps the prompt narrow so the model pays attention to the real setup.' },
-          ].map((c, i) => (
-            <AnimCard key={c.h} i={i}>
-              <h3 className="text-lg font-bold text-[var(--ct-text)] mb-3 leading-snug">{c.h}</h3>
-              <p className="text-sm text-[var(--ct-muted)] leading-relaxed">{c.b}</p>
-            </AnimCard>
-          ))}
-        </div>
-      </section>
-
-      {/* ── SCROLL STORY ── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid lg:grid-cols-[2fr_3fr] gap-16">
-          <div className="lg:sticky lg:top-32 h-fit">
-            <p className="font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase mb-4">Scroll story</p>
-            <h2 className="text-4xl font-bold text-[var(--ct-text)] leading-tight mb-4">
-              The product tells the trade story in the right order.
-            </h2>
-            <p className="text-[var(--ct-muted)]">
-              No fake certainty. No noisy dashboard theater. Just a tighter market brief from the moment the user opens the page.
-            </p>
-          </div>
-          <div className="flex flex-col gap-6">
-            {[
-              { num: '01', title: 'Frame the market problem', body: 'Hermes starts with the position, catalyst, and downside. It does not waste time pretending every prompt is a blank slate.' },
-              { num: '02', title: 'Rank the context that matters', body: 'Portfolio notes, watchlist details, prior instructions, and ticker-specific memory are scored before each request.' },
-              { num: '03', title: 'Route through the healthiest model lane', body: 'The desk tries premium or free routes in order, then writes the exact provider result into the audit trail so the trader knows what really happened.' },
-              { num: '04', title: 'Return a brief a trader can use', body: 'The answer should sound like a sharp market operator: risk first, setup second, and no fantasy about trades being executed.' },
-            ].map((s, i) => <StoryStep key={s.num} {...s} i={i} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* ── USE CASES ── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <p className="font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase mb-4">Use cases</p>
-        <h2 className="text-4xl font-bold text-[var(--ct-text)] mb-12 leading-tight max-w-2xl">
-          This product solves real trader pain, not abstract AI theater.
+      {/* USE CASES */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <p className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase mb-4">
+          {tr(t.home.useCasesLabel, lang)}
+        </p>
+        <h2 className="text-4xl font-bold text-[var(--text)] mb-12 leading-tight max-w-2xl">
+          {tr(t.home.useCasesTitle, lang)}
         </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { h: 'Concentration risk before earnings', b: 'Ask whether a single-name position is now portfolio risk. Hermes checks size, sector overlap, and known catalyst dates.' },
-            { h: 'Position sizing under real constraints', b: 'Run capital, stop distance, and catalyst timing through one brief instead of three tabs and a spreadsheet.' },
-            { h: 'Watchlist triage in one pass', b: 'Compare symbols on liquidity, catalyst quality, and risk before the market opens.' },
-          ].map((c, i) => (
-            <AnimCard key={c.h} i={i}>
-              <h3 className="text-lg font-bold text-[var(--ct-text)] mb-3 leading-snug">{c.h}</h3>
-              <p className="text-sm text-[var(--ct-muted)] leading-relaxed">{c.b}</p>
-            </AnimCard>
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          className="grid md:grid-cols-3 gap-6"
+        >
+          {t.home.useCases.map((c, i) => (
+            <Card key={i}>
+              <h3 className="text-lg font-bold text-[var(--text)] mb-3 leading-snug">{tr(c.h, lang)}</h3>
+              <p className="text-sm text-[var(--muted)] leading-relaxed">{tr(c.b, lang)}</p>
+            </Card>
           ))}
-        </div>
+        </motion.div>
       </section>
 
-      {/* ── OPERATOR STACK ── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <p className="font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase mb-4">Operator stack</p>
-        <h2 className="text-4xl font-bold text-[var(--ct-text)] mb-12 leading-tight max-w-2xl">
-          Built to scale into an autonomous desk.
-        </h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            { h: 'Hermes operator layer', b: 'A product-facing market persona that stays concise, finance-literate, and explicit about uncertainty.' },
-            { h: 'jCodeMunch-style prompt discipline', b: 'Ranked context, turn budgets, and compact session packing reduce waste before each provider request.' },
-            { h: 'Browser harness ready', b: 'The operator stack is documented so Hermes can graduate into browser-driven workflows when the browser harness is connected.' },
-            { h: 'Gateway plus provider flexibility', b: 'You can swing between direct providers, Synthia Gateway, and the backend without rebuilding the product story.' },
-          ].map((c, i) => (
-            <AnimCard key={c.h} i={i}>
-              <h3 className="text-lg font-bold text-[var(--ct-text)] mb-3">{c.h}</h3>
-              <p className="text-sm text-[var(--ct-muted)] leading-relaxed">{c.b}</p>
-            </AnimCard>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="rounded-3xl border border-[var(--ct-border)] bg-[var(--ct-card)] p-12">
-          <p className="font-mono text-xs text-[var(--ct-emerald)] tracking-widest uppercase mb-4">Next move</p>
-          <h2 className="text-4xl font-bold text-[var(--ct-text)] mb-8 leading-tight max-w-2xl">
-            Put Hermes on a live brief and watch the route stack work.
+      {/* CTA BOX */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-12">
+          <p className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase mb-4">
+            {lang === 'sr' ? 'Sledeći korak' : 'Next step'}
+          </p>
+          <h2 className="text-4xl font-bold text-[var(--text)] mb-4 leading-tight max-w-2xl">
+            {tr(t.home.ctaBoxTitle, lang)}
           </h2>
+          <p className="text-[var(--muted)] mb-10">
+            {tr(t.home.ctaBoxSub, lang)}
+          </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/demo"
-              className="rounded-xl bg-[var(--ct-emerald)] px-8 py-4 font-semibold text-black hover:bg-[var(--ct-emerald-dim)] transition-colors">
-              Watch the live demo
+            <Link
+              href="/analyze"
+              className="rounded-xl bg-[var(--accent)] px-8 py-4 font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors"
+            >
+              {tr(t.home.ctaPrimary, lang)}
             </Link>
-            <Link href="/hermes"
-              className="rounded-xl border border-[var(--ct-border)] px-8 py-4 font-semibold text-[var(--ct-text)] hover:border-[var(--ct-emerald)] transition-colors">
-              Open the workspace
+            <Link
+              href="/onboarding"
+              className="rounded-xl border border-[var(--border)] px-8 py-4 font-semibold text-[var(--text)] hover:border-[var(--accent)] transition-colors"
+            >
+              {tr(t.nav.onboarding, lang)}
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* DISCLAIMER */}
+      <section className="mx-auto max-w-7xl px-6 pb-16">
+        <p className="text-xs text-[var(--muted)] opacity-60 leading-relaxed border-t border-[var(--border)] pt-8">
+          {tr(t.home.disclaimer, lang)}
+        </p>
       </section>
 
     </div>
