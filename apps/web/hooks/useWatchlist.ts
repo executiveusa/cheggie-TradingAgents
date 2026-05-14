@@ -17,9 +17,8 @@ export function useWatchlist() {
     setLoaded(true)
   }, [])
 
-  const save = (next: string[]) => {
+  const persist = (next: string[]) => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch {}
-    setTickers(next)
   }
 
   const add = useCallback((sym: string) => {
@@ -28,7 +27,7 @@ export function useWatchlist() {
     setTickers((prev) => {
       if (prev.includes(upper) || prev.length >= MAX_TICKERS) return prev
       const next = [...prev, upper]
-      save(next)
+      persist(next)
       return next
     })
     return true
@@ -37,13 +36,14 @@ export function useWatchlist() {
   const remove = useCallback((sym: string) => {
     setTickers((prev) => {
       const next = prev.filter((t) => t !== sym)
-      save(next)
+      persist(next)
       return next
     })
   }, [])
 
   const clear = useCallback(() => {
-    save([])
+    setTickers([])
+    try { localStorage.removeItem(STORAGE_KEY) } catch {}
   }, [])
 
   return { tickers, add, remove, clear, loaded }

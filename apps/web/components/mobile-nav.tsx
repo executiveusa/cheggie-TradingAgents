@@ -57,7 +57,7 @@ export default function MobileNav() {
             <Link
               href="/analyze"
               onClick={() => setOpen(false)}
-              className="flex-1 text-center rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors"
+              className="flex-1 text-center rounded-xl bg-[var(--ct-emerald)] px-6 py-3 font-semibold text-black hover:bg-[var(--ct-emerald-dim)] transition-colors"
             >
               {tr(t.nav.launchApp, lang)}
             </Link>

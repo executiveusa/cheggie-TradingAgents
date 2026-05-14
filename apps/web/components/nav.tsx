@@ -79,7 +79,7 @@ export default function Nav() {
 
           <Link
             href="/analyze"
-            className="hidden lg:block rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors"
+            className="hidden lg:block rounded-xl bg-[var(--ct-emerald)] px-6 py-3 font-semibold text-black hover:bg-[var(--ct-emerald-dim)] transition-colors"
           >
             {tr(t.nav.launchApp, lang)}
           </Link>

@@ -6,9 +6,14 @@ import { useLanguage } from '@/lib/language-context'
 import { useBriefHistory } from '@/hooks/useBriefHistory'
 
 const riskColor = (r: string) => {
-  if (r === 'HIGH') return 'text-red-400 bg-red-500/10 border-red-500/20'
-  if (r === 'MEDIUM') return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20'
+  if (r === 'HIGH') return 'text-[var(--danger)] bg-[var(--danger)]/10 border-[var(--danger)]/20'
+  if (r === 'MEDIUM') return 'text-[var(--warning)] bg-[var(--warning)]/10 border-[var(--warning)]/20'
   return 'text-[var(--accent)] bg-[var(--accent)]/10 border-[var(--accent)]/20'
+}
+
+function escapeCsv(value: unknown): string {
+  const s = String(value ?? '')
+  return `"${s.replace(/"/g, '""')}"`
 }
 
 function downloadCsv(data: ReturnType<typeof useBriefHistory>['history'], lang: string) {
@@ -16,7 +21,17 @@ function downloadCsv(data: ReturnType<typeof useBriefHistory>['history'], lang: 
     ? ['Ticker', 'Rizik', 'Katalizator', 'Put zaštite', 'Model', 'Tokeni', 'Vreme (ms)', 'Ruta', 'Timestamp']
     : ['Ticker', 'Risk', 'Catalyst', 'Hedge path', 'Model', 'Tokens', 'Time (ms)', 'Route', 'Timestamp']
   const rows = data.map((b) =>
-    [b.ticker, b.risk, `"${b.catalyst.replace(/"/g, '""')}"`, `"${b.hedge.replace(/"/g, '""')}"`, b.model_note, b.tokens, b.time_ms, b.route, b.timestamp].join(',')
+    [
+      escapeCsv(b.ticker),
+      escapeCsv(b.risk),
+      escapeCsv(b.catalyst),
+      escapeCsv(b.hedge),
+      escapeCsv(b.model_note),
+      b.tokens ?? 0,
+      b.time_ms ?? 0,
+      escapeCsv(b.route),
+      escapeCsv(b.timestamp),
+    ].join(',')
   )
   const csv = [headers.join(','), ...rows].join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })

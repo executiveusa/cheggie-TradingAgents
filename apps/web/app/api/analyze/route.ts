@@ -13,10 +13,15 @@ const DEMO_BRIEF = {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+  if (!body.ticker || typeof body.ticker !== 'string' || !body.ticker.trim()) {
+    return NextResponse.json({ error: 'Invalid ticker' }, { status: 400 })
+  }
+
+  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
 
   if (!apiUrl) {
-    return NextResponse.json({ ...DEMO_BRIEF, ticker: body.ticker || 'NVDA' })
+    return NextResponse.json({ ...DEMO_BRIEF, ticker: body.ticker })
   }
 
   try {
@@ -26,9 +31,13 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(30000),
     })
+    if (!res.ok) {
+      console.error(`[API /analyze] Backend returned ${res.status}`)
+      throw new Error(`Backend error: ${res.status}`)
+    }
     const data = await res.json()
     return NextResponse.json(data)
   } catch {
-    return NextResponse.json({ ...DEMO_BRIEF, ticker: body.ticker || 'NVDA', mode: 'demo-fallback' })
+    return NextResponse.json({ ...DEMO_BRIEF, ticker: body.ticker, mode: 'demo-fallback' })
   }
 }

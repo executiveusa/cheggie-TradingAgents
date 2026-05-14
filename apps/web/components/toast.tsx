@@ -20,7 +20,7 @@ export function toast(message: string, type: ToastType = 'info') {
 
 const typeStyles: Record<ToastType, string> = {
   success: 'border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]',
-  error: 'border-[var(--danger)] bg-red-500/10 text-red-400',
+  error: 'border-[var(--danger)] bg-[var(--danger)]/10 text-[var(--danger)]',
   info: 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]',
 }
 
@@ -40,7 +40,12 @@ export function ToastProvider() {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
+    <div
+      className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       {toasts.map((t) => (
         <div
           key={t.id}

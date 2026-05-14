@@ -133,7 +133,13 @@ def dcf_model(
 def lbo_model(ticker: str, target_irr: float = 0.20, hold_years: int = 5, **kwargs) -> dict[str, Any]:
     """Simplified LBO model using yfinance balance sheet and EBITDA data."""
     if hold_years <= 0:
-        raise ValueError("hold_years must be > 0")
+        return {
+            "skill": "/lbo",
+            "ticker": ticker.upper(),
+            "error": "invalid_hold_years",
+            "input": {"hold_years": hold_years},
+            "data_source": "yfinance",
+        }
     info = get_ticker_info(ticker)
 
     ebitda = info.get("ebitda", 0) or 0

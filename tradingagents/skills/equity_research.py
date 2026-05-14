@@ -121,8 +121,11 @@ def thesis_tracking(ticker: str, memory_log_path: str | None = None, **kwargs) -
     entries: list[dict] = []
     content = ""
     if os.path.isfile(log_path):
-        with open(log_path, encoding="utf-8") as f:
-            content = f.read()
+        try:
+            with open(log_path, encoding="utf-8") as f:
+                content = f.read()
+        except OSError as exc:
+            logger.warning("Could not read memory log %s: %s", log_path, exc)
     elif os.path.exists(log_path):
         logger.warning("memory log path exists but is not a file: %s", log_path)
     # Parse entries matching this ticker

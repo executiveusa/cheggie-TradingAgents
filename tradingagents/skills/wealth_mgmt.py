@@ -36,12 +36,12 @@ def portfolio_review(
         ]
 
     for sym in all_tickers:
+        weight = next(
+            (p.get("weight_pct", 0) for p in (positions or []) if str(p.get("ticker", "")).upper() == sym),
+            100.0 if not positions and sym == ticker.upper() else 0.0,
+        )
         try:
             info = yf.Ticker(sym).info or {}
-            weight = next(
-                (p.get("weight_pct", 0) for p in (positions or []) if p.get("ticker", "").upper() == sym),
-                100.0 if not positions and sym == ticker.upper() else 0.0,
-            )
             position_snapshots.append({
                 "ticker": sym,
                 "weight_pct": weight,
@@ -54,7 +54,12 @@ def portfolio_review(
             })
         except Exception as exc:
             logger.debug("Could not fetch data for %s: %s", sym, exc)
-            position_snapshots.append({"ticker": sym, "error": "data_unavailable", "error_type": type(exc).__name__})
+            position_snapshots.append({
+                "ticker": sym,
+                "weight_pct": weight,
+                "error": "data_unavailable",
+                "error_type": type(exc).__name__,
+            })
 
     # Concentration check
     weights = [p.get("weight_pct", 0) for p in position_snapshots]
