@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { useTheme } from 'next-themes'
+import { useState, useRef, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { CTLogo } from '@/lib/logo'
 import { useLanguage } from '@/lib/language-context'
 import { t, tr } from '@/lib/i18n'
+import { useBriefHistory } from '@/hooks/useBriefHistory'
+import { toast } from '@/components/toast'
 
 type RoutePreference = 'auto' | 'gateway' | 'grok' | 'groq' | 'openrouter' | 'gemini'
 type CatalystType = 'earnings' | 'macro' | 'technical' | 'custom'
@@ -23,17 +25,15 @@ interface Brief {
 
 const ROUTES: RoutePreference[] = ['auto', 'gateway', 'grok', 'groq', 'openrouter', 'gemini']
 const ROUTE_LABELS: Record<RoutePreference, string> = {
-  auto: 'Auto',
-  gateway: 'Gateway',
-  grok: 'Grok',
-  groq: 'Groq',
-  openrouter: 'OpenRouter',
-  gemini: 'Gemini',
+  auto: 'Auto', gateway: 'Gateway', grok: 'Grok', groq: 'Groq', openrouter: 'OpenRouter', gemini: 'Gemini',
 }
 
-export default function AnalyzePage() {
+function AnalyzeForm() {
   const { lang } = useLanguage()
-  const [ticker, setTicker] = useState('')
+  const searchParams = useSearchParams()
+  const { addBrief } = useBriefHistory()
+
+  const [ticker, setTicker] = useState(searchParams.get('ticker') || '')
   const [size, setSize] = useState('')
   const [catalyst, setCatalyst] = useState<CatalystType>('earnings')
   const [downside, setDownside] = useState('')
@@ -42,6 +42,11 @@ export default function AnalyzePage() {
   const [brief, setBrief] = useState<Brief | null>(null)
   const [followUp, setFollowUp] = useState('')
   const outputRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const sym = searchParams.get('ticker')
+    if (sym) setTicker(sym.toUpperCase())
+  }, [searchParams])
 
   async function handleBrief() {
     if (!ticker.trim()) return
@@ -54,9 +59,13 @@ export default function AnalyzePage() {
         body: JSON.stringify({ ticker, size, catalyst, downside, route }),
       })
       const data = await res.json()
-      setBrief({ ...data, timestamp: new Date().toLocaleTimeString() })
+      const record: Brief = { ...data, timestamp: new Date().toLocaleTimeString() }
+      setBrief(record)
+      addBrief({ ...record, route })
+      toast(lang === 'sr' ? `Analiza za ${ticker} završena` : `Brief for ${ticker} complete`, 'success')
     } catch {
-      setBrief({
+      const ms = Date.now() - start
+      const demo: Brief = {
         ticker: ticker || 'NVDA',
         risk: 'HIGH',
         catalyst: lang === 'sr'
@@ -67,10 +76,13 @@ export default function AnalyzePage() {
           : 'Size down to 15% before the print or buy put spread 30 days out.',
         model_note: 'Demo mode — backend offline',
         tokens: 0,
-        time_ms: Date.now() - start,
+        time_ms: ms,
         mode: 'demo',
         timestamp: new Date().toLocaleTimeString(),
-      })
+      }
+      setBrief(demo)
+      addBrief({ ...demo, route })
+      toast(lang === 'sr' ? 'Demo režim — backend offline' : 'Demo mode — backend offline', 'info')
     } finally {
       setLoading(false)
     }
@@ -92,10 +104,10 @@ export default function AnalyzePage() {
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg)] overflow-hidden">
 
-      {/* HEADER */}
-      <div className="flex items-center justify-between px-6 border-b border-[var(--border)] h-14 flex-shrink-0">
+      {/* SUB-HEADER */}
+      <div className="flex items-center justify-between px-6 border-b border-[var(--border)] h-12 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <CTLogo className="h-6 w-6 text-[var(--accent)]" />
+          <CTLogo className="h-5 w-5 text-[var(--accent)]" />
           <span className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--accent)] uppercase">
             {tr(t.analyze.eyebrow, lang)}
           </span>
@@ -109,10 +121,10 @@ export default function AnalyzePage() {
       </div>
 
       {/* BODY */}
-      <div className="grid lg:grid-cols-[340px_1fr] flex-1 overflow-hidden">
+      <div className="grid lg:grid-cols-[320px_1fr] flex-1 overflow-hidden">
 
         {/* LEFT PANEL */}
-        <aside className="bg-[var(--surface)] border-r border-[var(--border)] p-6 overflow-y-auto">
+        <aside className="bg-[var(--surface)] border-r border-[var(--border)] p-5 overflow-y-auto">
 
           <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-5">
             {tr(t.analyze.title, lang)}
@@ -172,8 +184,8 @@ export default function AnalyzePage() {
             {loading ? tr(t.analyze.running, lang) : tr(t.analyze.runBrief, lang)}
           </button>
 
-          {/* Route selection */}
-          <div className="mt-8">
+          {/* Route */}
+          <div className="mt-7">
             <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-3">
               {tr(t.analyze.route, lang)}
             </p>
@@ -195,7 +207,7 @@ export default function AnalyzePage() {
           </div>
 
           {/* Audit */}
-          <div className="mt-8">
+          <div className="mt-7">
             <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-3">
               {tr(t.analyze.audit, lang)}
             </p>
@@ -231,7 +243,7 @@ export default function AnalyzePage() {
 
             {!loading && !brief && (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-                <CTLogo className="h-16 w-16 text-[var(--accent)] animate-float opacity-30" />
+                <CTLogo className="h-16 w-16 text-[var(--accent)] animate-float opacity-25" />
                 <p className="text-[var(--muted)]">{tr(t.analyze.emptyState, lang)}</p>
               </div>
             )}
@@ -239,7 +251,7 @@ export default function AnalyzePage() {
             {!loading && brief && (
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 max-w-2xl">
                 <div className="flex items-center gap-3 mb-6 flex-wrap">
-                  <span className="font-mono font-bold text-[var(--accent)] text-xl">{brief.ticker}</span>
+                  <span className="font-mono font-bold text-[var(--accent)] text-2xl">{brief.ticker}</span>
                   <span className="px-2 py-0.5 rounded-full border border-[var(--border)] text-xs text-[var(--muted)]">
                     {catalyst}
                   </span>
@@ -266,7 +278,9 @@ export default function AnalyzePage() {
                   <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">
                     {tr(t.analyze.hedgePath, lang)}
                   </p>
-                  <p className="text-sm text-[var(--text)] leading-relaxed">{brief.hedge || (lang === 'sr' ? 'Nije identifikovano' : 'None identified')}</p>
+                  <p className="text-sm text-[var(--text)] leading-relaxed">
+                    {brief.hedge || (lang === 'sr' ? 'Nije identifikovano' : 'None identified')}
+                  </p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-[var(--border)]">
@@ -276,7 +290,7 @@ export default function AnalyzePage() {
             )}
           </div>
 
-          {/* Follow-up bar */}
+          {/* Follow-up */}
           <div className="border-t border-[var(--border)] p-4 flex gap-3 flex-shrink-0">
             <input
               type="text"
@@ -308,5 +322,13 @@ export default function AnalyzePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AnalyzePage() {
+  return (
+    <Suspense>
+      <AnalyzeForm />
+    </Suspense>
   )
 }

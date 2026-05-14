@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes'
 import { LanguageProvider } from '@/lib/language-context'
 import Nav from '@/components/nav'
 import Footer from '@/components/footer'
+import { ToastProvider } from '@/components/toast'
 
 export const metadata: Metadata = {
   title: 'CheggieTrade — Tržišna inteligencija za prave traders',
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Nav />
             <main>{children}</main>
             <Footer />
+            <ToastProvider />
           </LanguageProvider>
         </ThemeProvider>
       </body>

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { CTLogo } from '@/lib/logo'
 import { useLanguage } from '@/lib/language-context'
 import { t, tr } from '@/lib/i18n'
+import MobileNav from './mobile-nav'
 
 export default function Nav() {
   const { theme, setTheme } = useTheme()
@@ -19,6 +20,7 @@ export default function Nav() {
     { href: '/watchlist', label: tr(t.nav.watchlist, lang) },
     { href: '/models', label: tr(t.nav.models, lang) },
     { href: '/onboarding', label: tr(t.nav.onboarding, lang) },
+    { href: '/pricing', label: lang === 'sr' ? 'Cene' : 'Pricing' },
   ]
 
   return (
@@ -27,12 +29,12 @@ export default function Nav() {
 
         <Link href="/" className="flex items-center gap-2.5 text-[var(--accent)]">
           <CTLogo className="h-8 w-8 animate-glow" />
-          <span className="font-mono text-sm font-bold tracking-[0.15em] text-[var(--accent)] uppercase">
+          <span className="font-mono text-sm font-bold tracking-[0.15em] text-[var(--accent)] uppercase hidden sm:block">
             CheggieTrade
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-0.5">
           {links.map((l) => (
             <Link
               key={l.href}
@@ -49,7 +51,7 @@ export default function Nav() {
             <>
               <button
                 onClick={toggle}
-                className="rounded-lg border border-[var(--border)] px-3 py-1.5 font-mono text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] hover:border-[var(--accent)] transition-colors"
+                className="hidden sm:block rounded-lg border border-[var(--border)] px-3 py-1.5 font-mono text-xs font-semibold text-[var(--muted)] hover:text-[var(--text)] hover:border-[var(--accent)] transition-colors"
                 aria-label="Toggle language"
               >
                 {lang === 'sr' ? 'EN' : 'SR'}
@@ -77,10 +79,12 @@ export default function Nav() {
 
           <Link
             href="/analyze"
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors"
+            className="hidden lg:block rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--accent-dim)] transition-colors"
           >
             {tr(t.nav.launchApp, lang)}
           </Link>
+
+          <MobileNav />
         </div>
       </div>
     </header>

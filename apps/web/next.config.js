@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: process.env.DOCKER_BUILD === '1' ? 'standalone' : undefined,
+
   async redirects() {
     return [
       { source: '/hermes', destination: '/analyze', permanent: true },
