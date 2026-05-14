@@ -1,4 +1,54 @@
+version: '3.9'
+
 services:
+  # ── CheggieTrade Web (Next.js) ────────────────────────────────────────────
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://api:8000}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      # Leave blank to run in demo mode without auth (no Supabase required)
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - cheggie
+
+  # ── Python API (FastAPI) ──────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    ports:
+      - '8000:8000'
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - XAI_API_KEY=${XAI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - SYNTHIA_GATEWAY_URL=${SYNTHIA_GATEWAY_URL:-}
+      - GATEWAY_API_KEY=${GATEWAY_API_KEY:-}
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://localhost:8000/health")']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - cheggie
+
+  # ── Legacy TradingAgents CLI ──────────────────────────────────────────────
   tradingagents:
     build: .
     env_file:
@@ -7,6 +57,8 @@ services:
       - tradingagents_data:/home/appuser/.tradingagents
     tty: true
     stdin_open: true
+    profiles:
+      - cli
 
   ollama:
     image: ollama/ollama:latest
@@ -29,6 +81,10 @@ services:
     stdin_open: true
     profiles:
       - ollama
+
+networks:
+  cheggie:
+    driver: bridge
 
 volumes:
   tradingagents_data:

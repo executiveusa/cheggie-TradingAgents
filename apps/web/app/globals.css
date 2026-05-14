@@ -1,72 +1,121 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  --ct-bg: #080f0b;
-  --ct-card: #0d1a12;
-  --ct-subtle: #122018;
-  --ct-emerald: #22c55e;
-  --ct-emerald-dim: #15803d;
-  --ct-emerald-glow: rgba(34,197,94,0.15);
-  --ct-text: #f1f5f2;
-  --ct-muted: #8fa896;
-  --ct-border: rgba(34,197,94,0.15);
-  --ct-code: #86efac;
-  --font-sans: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --bg: #060c08;
+  --surface: #0c1610;
+  --elevated: #111d14;
+  --text: #edf2ee;
+  --muted: #7a9482;
+  --border: rgba(34, 197, 94, 0.12);
+  --accent: #22c55e;
+  --accent-dim: #16a34a;
+  --accent-glow: rgba(34, 197, 94, 0.18);
+  --positive: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --grid: rgba(34, 197, 94, 0.04);
+  --glow: rgba(34, 197, 94, 0.25);
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
 .light {
-  --ct-bg: #f0faf4;
-  --ct-card: #ffffff;
-  --ct-subtle: #e8f5ed;
-  --ct-emerald: #15803d;
-  --ct-emerald-dim: #166534;
-  --ct-emerald-glow: rgba(21,128,61,0.12);
-  --ct-text: #0a1a0f;
-  --ct-muted: #4a7c59;
-  --ct-border: rgba(21,128,61,0.2);
-  --ct-code: #166534;
+  --bg: #f4faf6;
+  --surface: #ffffff;
+  --elevated: #e9f5ee;
+  --text: #0b1a0f;
+  --muted: #4a7c59;
+  --border: rgba(21, 128, 61, 0.18);
+  --accent: #15803d;
+  --accent-dim: #166534;
+  --accent-glow: rgba(21, 128, 61, 0.12);
+  --positive: #15803d;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --grid: rgba(21, 128, 61, 0.04);
+  --glow: rgba(21, 128, 61, 0.2);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: 'ss01', 'ss02', 'cv01';
+}
 
 body {
   font-family: var(--font-sans);
-  background: var(--ct-bg);
-  color: var(--ct-text);
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a { color: inherit; text-decoration: none; }
 
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* Grid overlay utility */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-14px); }
+  50% { transform: translateY(-12px); }
 }
 @keyframes glow-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(34,197,94,0.3)); }
-  50% { filter: drop-shadow(0 0 24px rgba(34,197,94,0.7)); }
+  0%, 100% { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+  50% { filter: drop-shadow(0 0 20px var(--glow)); }
 }
 @keyframes progress-slide {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(400%); }
 }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-glow { animation: glow-pulse 4s ease-in-out infinite; }
+.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
 
-.hermes-progress-bar {
+/* Progress bar */
+.hermes-progress-bar,
+.ct-progress-bar {
   overflow: hidden;
   height: 2px;
-  background-color: var(--ct-subtle);
+  background-color: var(--surface);
 }
-.hermes-progress-bar::after {
+.hermes-progress-bar::after,
+.ct-progress-bar::after {
   content: '';
   display: block;
   height: 100%;
   width: 25%;
-  background-color: var(--ct-emerald);
+  background-color: var(--accent);
   animation: progress-slide 1.4s ease-in-out infinite;
+}
+
+/* Legacy ct-* aliases for backwards compat */
+:root {
+  --ct-bg: var(--bg);
+  --ct-card: var(--surface);
+  --ct-subtle: var(--elevated);
+  --ct-emerald: var(--accent);
+  --ct-emerald-dim: var(--accent-dim);
+  --ct-emerald-glow: var(--accent-glow);
+  --ct-text: var(--text);
+  --ct-muted: var(--muted);
+  --ct-border: var(--border);
 }
