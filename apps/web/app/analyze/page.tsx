@@ -41,25 +41,12 @@ function AnalyzeForm() {
   const [loading, setLoading] = useState(false)
   const [brief, setBrief] = useState<Brief | null>(null)
   const [followUp, setFollowUp] = useState('')
-  const [showDevSettings, setShowDevSettings] = useState(false)
-  const [showDetails, setShowDetails] = useState(false)
-  const [showHints, setShowHints] = useState(false)
   const outputRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const sym = searchParams.get('ticker')
     if (sym) setTicker(sym.toUpperCase())
   }, [searchParams])
-
-  useEffect(() => {
-    const seen = localStorage.getItem('ct-onboarding-seen')
-    if (!seen) setShowHints(true)
-  }, [])
-
-  function dismissHints() {
-    localStorage.setItem('ct-onboarding-seen', '1')
-    setShowHints(false)
-  }
 
   async function handleBrief(downsideOverride?: string) {
     if (!ticker.trim()) return
@@ -144,28 +131,6 @@ function AnalyzeForm() {
             {tr(t.analyze.title, lang)}
           </p>
 
-          {showHints && (
-            <div className="rounded-2xl border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-5 mb-6 relative">
-              <button
-                onClick={dismissHints}
-                aria-label={lang === 'sr' ? 'Zatvori uputstvo' : 'Dismiss guide'}
-                className="absolute top-4 right-4 text-[var(--muted)] hover:text-[var(--text)]"
-              >✕</button>
-              <p className="font-mono text-xs text-[var(--accent)] tracking-widest uppercase mb-3">
-                {lang === 'sr' ? 'PRVI PUT?' : 'FIRST TIME?'}
-              </p>
-              <ul className="text-sm text-[var(--muted)] space-y-2 leading-relaxed">
-                <li><strong className="text-[var(--text)]">{lang === 'sr' ? 'Ticker' : 'Ticker'}</strong> — {lang === 'sr' ? 'Simbol akcije ili kripto (npr. AAPL, BTC)' : 'Stock or crypto symbol (e.g. AAPL, BTC)'}</li>
-                <li><strong className="text-[var(--text)]">{lang === 'sr' ? 'Veličina pozicije' : 'Position size'}</strong> — {lang === 'sr' ? 'Procenat kapitala koji planirate uložiti' : 'Percentage of your capital you plan to invest'}</li>
-                <li><strong className="text-[var(--text)]">{lang === 'sr' ? 'Katalizator' : 'Catalyst'}</strong> — {lang === 'sr' ? 'Šta pokreće ovu ideju (zarada, makro, tehnički setap)' : 'What drives this idea (earnings, macro, technical setup)'}</li>
-                <li><strong className="text-[var(--text)]">{lang === 'sr' ? 'Negativni faktori' : 'Downside notes'}</strong> — {lang === 'sr' ? 'Šta bi poništilo vašu tezu' : 'What would invalidate your thesis'}</li>
-              </ul>
-              <a href="/onboarding" className="inline-block mt-4 text-xs text-[var(--accent)] hover:underline">
-                {lang === 'sr' ? '→ Pogledaj kompletan vodič' : '→ View the full guide'}
-              </a>
-            </div>
-          )}
-
           <label className="block text-xs font-semibold text-[var(--muted)] mb-1.5 uppercase tracking-wider">
             {tr(t.analyze.ticker, lang)}
           </label>
@@ -220,42 +185,45 @@ function AnalyzeForm() {
             {loading ? tr(t.analyze.running, lang) : tr(t.analyze.runBrief, lang)}
           </button>
 
-          {/* Developer settings accordion - hidden by default */}
-          <div className="border-t border-[var(--border)] pt-4 mt-7">
-            <button
-              type="button"
-              onClick={() => setShowDevSettings(v => !v)}
-              className="flex items-center gap-2 text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors"
-              aria-expanded={showDevSettings}
-            >
-              <svg className={`h-3 w-3 transition-transform ${showDevSettings ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              <span className="font-mono tracking-widest uppercase">
-                {lang === 'sr' ? 'Podešavanja programera' : 'Developer settings'}
-              </span>
-            </button>
-            {showDevSettings && (
-              <div className="mt-3">
-                <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-3">
-                  {tr(t.analyze.route, lang)}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {ROUTES.map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => setRoute(r)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                        route === r
-                          ? 'bg-[var(--accent)] text-black'
-                          : 'border border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] hover:border-[var(--accent)]'
-                      }`}
-                    >
-                      {ROUTE_LABELS[r]}
-                    </button>
-                  ))}
-                </div>
+          {/* Route */}
+          <div className="mt-7">
+            <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-3">
+              {tr(t.analyze.route, lang)}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {ROUTES.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRoute(r)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    route === r
+                      ? 'bg-[var(--accent)] text-black'
+                      : 'border border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] hover:border-[var(--accent)]'
+                  }`}
+                >
+                  {ROUTE_LABELS[r]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Audit */}
+          <div className="mt-7">
+            <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-3">
+              {tr(t.analyze.audit, lang)}
+            </p>
+            {brief ? (
+              <div className="font-mono text-xs text-[var(--muted)] space-y-1.5">
+                <p>Model: <span className="text-[var(--text)]">{brief.model_note}</span></p>
+                <p>Tokens: <span className="text-[var(--text)]">{brief.tokens > 0 ? brief.tokens : '—'}</span></p>
+                <p>Route: <span className="text-[var(--text)]">{route}</span></p>
+                <p>Time: <span className="text-[var(--text)]">{brief.time_ms > 0 ? `${(brief.time_ms / 1000).toFixed(1)}s` : '—'}</span></p>
+                <p>Mode: <span className="text-[var(--text)]">{brief.mode}</span></p>
               </div>
+            ) : (
+              <p className="font-mono text-xs text-[var(--muted)]">
+                {lang === 'sr' ? 'Još nije pokrenuta analiza' : 'No brief run yet'}
+              </p>
             )}
           </div>
         </aside>
@@ -317,24 +285,7 @@ function AnalyzeForm() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-[var(--border)]">
-                  <button
-                    type="button"
-                    onClick={() => setShowDetails(v => !v)}
-                    className="text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors font-mono tracking-widest uppercase mt-4"
-                  >
-                    {showDetails
-                      ? (lang === 'sr' ? '▲ Sakrij detalje' : '▲ Hide details')
-                      : (lang === 'sr' ? '▼ Prikaži detalje' : '▼ View details')}
-                  </button>
-                  {showDetails && (
-                    <div className="mt-3 space-y-2 text-xs font-mono text-[var(--muted)]">
-                      <p>Model: <span className="text-[var(--text)]">{brief.model_note}</span></p>
-                      <p>Tokens: <span className="text-[var(--text)]">{brief.tokens > 0 ? brief.tokens : '—'}</span></p>
-                      <p>Route: <span className="text-[var(--text)]">{route}</span></p>
-                      <p>Time: <span className="text-[var(--text)]">{brief.time_ms > 0 ? `${(brief.time_ms / 1000).toFixed(1)}s` : '—'}</span></p>
-                      <p>Mode: <span className="text-[var(--text)]">{brief.mode}</span></p>
-                    </div>
-                  )}
+                  <p className="font-mono text-xs text-[var(--muted)]">{brief.model_note}</p>
                 </div>
               </div>
             )}

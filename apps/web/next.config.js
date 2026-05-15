@@ -8,7 +8,6 @@ const nextConfig = {
       { source: '/demo', destination: '/analyze', permanent: true },
       { source: '/method', destination: '/api-docs', permanent: true },
       { source: '/operator', destination: '/agents', permanent: true },
-      { source: '/models', destination: '/skills', permanent: true },
     ]
   },
 }
