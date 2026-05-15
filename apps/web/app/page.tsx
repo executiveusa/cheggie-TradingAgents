@@ -100,28 +100,28 @@ export default function Home() {
             </p>
             <p className="text-2xl font-bold text-[var(--text)] mb-8 leading-snug">
               {lang === 'sr'
-                ? 'Hermes meri koncentraciju, likvidnost, rizik katalizatora i puteve zaštite pre nego što ikada zvuči sigurno.'
-                : 'Hermes weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain.'}
+                ? 'Asistent meri koncentraciju, likvidnost, rizik katalizatora i puteve zaštite pre nego što ikada zvuči sigurno.'
+                : 'The assistant weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain.'}
             </p>
 
             {[
               {
-                title: lang === 'sr' ? 'Grok prvi kada je konfigurisan' : 'Grok first when configured',
+                title: lang === 'sr' ? 'Analitičar ide prvi' : 'The analyst leads',
                 body: lang === 'sr'
-                  ? 'Desk može da rutira kroz xAI i ponovo koristi stabilni session id za bolje ponašanje keširanje prompta.'
-                  : 'The desk can route through xAI and reuse a stable session id for better prompt-cache behavior.',
+                  ? 'Tržišni analitičar postavlja okvir: koja je teza, koji su katalizatori i šta može poći po zlu.'
+                  : 'The market analyst frames the thesis: what is the idea, what are the catalysts, and what can go wrong.',
               },
               {
-                title: lang === 'sr' ? 'Groq za brzinu' : 'Groq for speed',
+                title: lang === 'sr' ? 'Istraživač proverava podatke' : 'The researcher checks the data',
                 body: lang === 'sr'
-                  ? 'Groq ostaje u lancu za brzo rezonovanje kada je dostupan kompatibilan ključ.'
-                  : 'Groq stays in the chain for fast reasoning when a compatible key is available.',
+                  ? 'Fundamentalni istraživač proverava valuaciju, rast i kvalitet bilansa pre nego što se teza prihvati.'
+                  : 'The fundamental researcher checks valuation, growth, and balance sheet quality before the thesis is accepted.',
               },
               {
-                title: lang === 'sr' ? 'OpenRouter zakačen za besplatnu NVIDIA liniju' : 'OpenRouter pinned to a free NVIDIA lane',
+                title: lang === 'sr' ? 'Risk menadžer ima poslednju reč' : 'The risk manager has the final word',
                 body: lang === 'sr'
-                  ? 'Podrazumevani OpenRouter model je poznata NVIDIA besplatna ruta.'
-                  : 'The default OpenRouter model is a known NVIDIA free route for actual final-answer text.',
+                  ? 'Risk menadžer testira veličinu pozicije i zaštitu. Bez pozitivnog mišljenja risk menadžera, brif se ne šalje.'
+                  : 'The risk manager stress-tests position size and hedge. Without risk manager sign-off, the brief is not sent.',
               },
             ].map((f) => (
               <div key={f.title} className="border-l-2 border-[var(--accent)] pl-4 mb-5">
