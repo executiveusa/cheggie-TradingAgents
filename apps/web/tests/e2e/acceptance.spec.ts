@@ -129,3 +129,61 @@ test('skills catalogue — financial skills listed', async ({ page }) => {
   await expect(page.getByText('/comps')).toBeVisible()
   await expect(page.getByText('/dcf')).toBeVisible()
 })
+
+// ── Test 11: How it works anchor ──────────────────────────────────────────────
+test('homepage has #how-it-works anchor section', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('#how-it-works')).toBeAttached()
+})
+
+// ── Test 12: Secondary CTA links to #how-it-works ────────────────────────────
+test('secondary CTA links to #how-it-works', async ({ page }) => {
+  await page.goto('/')
+  const secondaryCta = page.getByRole('link', { name: /kako radi|how it works/i }).first()
+  await expect(secondaryCta).toBeVisible()
+  const href = await secondaryCta.getAttribute('href')
+  expect(href).toMatch(/#how-it-works/)
+})
+
+// ── Test 13: Primary nav structure ───────────────────────────────────────────
+test('primary nav has correct links', async ({ page }) => {
+  await page.goto('/')
+  const nav = page.locator('header nav')
+  await expect(nav.getByRole('link', { name: /analiziraj|analyze/i })).toBeVisible()
+  await expect(nav.getByRole('link', { name: /izveštaji|reports/i })).toBeVisible()
+  await expect(nav.getByRole('link', { name: /praćenje|watchlist/i })).toBeVisible()
+  await expect(nav.getByRole('link', { name: /asistent|assistant/i })).toBeVisible()
+  // Models must NOT be in primary nav
+  await expect(nav.getByRole('link', { name: /^modeli$|^models$/i })).not.toBeVisible()
+})
+
+// ── Test 14: Legacy /hermes redirects to /assistant ───────────────────────────
+test('legacy /hermes redirects to /assistant', async ({ page }) => {
+  await page.goto('/hermes')
+  expect(page.url()).toContain('/assistant')
+})
+
+// ── Test 15: Legacy /demo redirects to /analyze ───────────────────────────────
+test('legacy /demo redirects to /analyze', async ({ page }) => {
+  await page.goto('/demo')
+  expect(page.url()).toContain('/analyze')
+})
+
+// ── Test 16: Public homepage accessible without auth ─────────────────────────
+test('homepage accessible without auth', async ({ page }) => {
+  await page.goto('/')
+  await expect(page).not.toHaveURL(/login|auth/)
+  await expect(page.locator('body')).not.toContainText('404')
+})
+
+// ── Test 17: Onboarding accessible without auth ───────────────────────────────
+test('/onboarding accessible without auth', async ({ page }) => {
+  await page.goto('/onboarding')
+  await expect(page).not.toHaveURL(/login|auth/)
+})
+
+// ── Test 18: Status accessible without auth ───────────────────────────────────
+test('/status accessible without auth', async ({ page }) => {
+  await page.goto('/status')
+  await expect(page).not.toHaveURL(/login|auth/)
+})

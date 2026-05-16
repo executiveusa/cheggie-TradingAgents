@@ -5,36 +5,36 @@ export const t = {
     analyze: { sr: 'Analiziraj', en: 'Analyze' },
     reports: { sr: 'Izveštaji', en: 'Reports' },
     watchlist: { sr: 'Praćenje', en: 'Watchlist' },
+    assistant: { sr: 'Asistent', en: 'Assistant' },
     models: { sr: 'Modeli', en: 'Models' },
     onboarding: { sr: 'Početak', en: 'Onboarding' },
     launchApp: { sr: 'Otvori aplikaciju', en: 'Launch App' },
   },
   home: {
-    eyebrow: { sr: 'CHEGGIE TRADE', en: 'CHEGGIE TRADE' },
+    eyebrow: { sr: 'AI trading desk za Balkan tržište', en: 'AI trading desk for Balkan markets' },
     hero: {
-      sr: 'Tržišna inteligencija za trgovce koji žele pravi odgovor.',
-      en: 'Market intelligence for traders who want the real answer.',
+      sr: 'CheggieTrade pretvara tržišnu buku u jasan trading plan.',
+      en: 'CheggieTrade turns market noise into a clear trading plan.',
     },
     heroSub: {
-      sr: 'CheggieTrade analizira koncentraciju, likvidnost, katalizatorski rizik i puteve zaštite — pre nego što zvuči sigurno. Šest ruta modela, potpuna evidencija.',
-      en: 'CheggieTrade weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain. Six model routes, full audit trail.',
+      sr: 'Više AI analitičara zajedno analizira tržište, proverava rizik i daje jasan izveštaj pre svake odluke.',
+      en: 'Multiple AI analysts work together to analyze the market, check risk, and deliver a clear brief before every decision.',
     },
     ctaPrimary: { sr: 'Pokreni analizu', en: 'Run Analysis' },
-    ctaSecondary: { sr: 'Pogledaj demo', en: 'View Demo' },
-    ctaTertiary: { sr: 'Vidi metod', en: 'See the Method' },
+    ctaSecondary: { sr: 'Kako radi', en: 'How it works' },
     statsLabel: { sr: 'Platforma u brojevima', en: 'Platform by numbers' },
     stats: [
       {
-        stat: { sr: '6 ruta', en: '6 routes' },
-        desc: { sr: 'xAI, Groq, OpenRouter, Gemini, gateway, backend', en: 'xAI, Groq, OpenRouter, Gemini, gateway, backend' },
+        stat: { sr: '5 analitičara', en: '5 analysts' },
+        desc: { sr: 'Specijalizovani AI agenti rade zajedno na svakom brifingu', en: 'Specialized AI agents collaborate on every brief' },
       },
       {
         stat: { sr: '1 evidencija', en: '1 audit' },
-        desc: { sr: 'Svaki odgovor prijavljuje rutu koja ga je proizvela', en: 'Every answer reports the route that produced it' },
+        desc: { sr: 'Svaki odgovor je dokumentovan sa punim obrazloženjem', en: 'Every answer is documented with full reasoning trail' },
       },
       {
-        stat: { sr: 'Kompresija', en: 'Compression' },
-        desc: { sr: 'Kontekst sesije se sažima pre slanja modelu', en: 'Session context is compressed before it hits the model' },
+        stat: { sr: 'Rizik prvi', en: 'Risk first' },
+        desc: { sr: 'Svaki brifing počinje procenom rizika, ne preporukom', en: 'Every brief starts with risk assessment, not a recommendation' },
       },
     ],
     problemLabel: { sr: 'Problem', en: 'The Problem' },
@@ -48,8 +48,8 @@ export const t = {
         b: { sr: 'CheggieTrade pretvara odgovor u čitljiv tržišni brifing, tako da trader može da ospori tezu pre akcije.', en: 'CheggieTrade turns the answer into a readable market brief so the trader can challenge the thesis before acting.' },
       },
       {
-        h: { sr: 'Tokenski troškovi treba da idu u prosudbu, ne šum.', en: 'Token spend should go into judgment, not noise.' },
-        b: { sr: 'Hermes pakuje kontekst, skraćuje ponavljajuću memoriju i drži prompt uzak, tako da model posveti pažnju stvarnom setapu.', en: 'Hermes packs context, trims repeated memory, and keeps the prompt narrow so the model pays attention to the real setup.' },
+        h: { sr: 'Analiza treba da ide u prosudbu, ne šum.', en: 'Analysis should go into judgment, not noise.' },
+        b: { sr: 'Platforma pakuje relevantan kontekst, eliminiše ponavljanje i fokusira pažnju na stvarni tržišni setap.', en: 'The platform packs relevant context, eliminates repetition, and focuses attention on the real market setup.' },
       },
     ],
     solutionLabel: { sr: 'Rešenje', en: 'The Solution' },
@@ -68,13 +68,13 @@ export const t = {
       },
       {
         num: '03',
-        title: { sr: 'Ruta kroz najzdraviju modelsku liniju', en: 'Route through the healthiest model lane' },
-        body: { sr: 'Desk pokušava premium ili besplatne rute po redu, zatim upisuje tačan rezultat provajdera u evidenciju.', en: 'The desk tries premium or free routes in order, then writes the exact provider result into the audit trail.' },
+        title: { sr: 'Višestruka provera i usaglašavanje', en: 'Multi-agent review and consensus' },
+        body: { sr: 'Različiti specijalizovani agenti paralelno analiziraju iste podatke i usaglašavaju zaključke pre finalnog odgovora.', en: 'Different specialized agents analyze the same data in parallel and align conclusions before the final answer.' },
       },
       {
         num: '04',
-        title: { sr: 'Vrati brifing koji trader može da koristi', en: 'Return a brief a trader can use' },
-        body: { sr: 'Odgovor treba da zvuči kao iskusan tržišni operator: rizik prvi, setap drugi, bez fantazija o izvršenim transakcijama.', en: 'The answer should sound like a sharp market operator: risk first, setup second, no fantasy about trades being executed.' },
+        title: { sr: 'Jasan brifing koji trader može odmah da koristi', en: 'Clear brief the trader can act on immediately' },
+        body: { sr: 'Odgovor zvuči kao iskusan tržišni operator: rizik prvi, setap drugi, bez spekulacija o izvršenju.', en: 'The answer sounds like a sharp market operator: risk first, setup second, no speculation about execution.' },
       },
     ],
     useCasesLabel: { sr: 'Slučajevi upotrebe', en: 'Use Cases' },
@@ -82,7 +82,7 @@ export const t = {
     useCases: [
       {
         h: { sr: 'Koncentracijski rizik pre zarade', en: 'Concentration risk before earnings' },
-        b: { sr: 'Pitajte da li pozicija sa jednim imenom sada predstavlja rizik portfolija. Hermes proverava veličinu, preklapanje sektora i poznate datume katalizatora.', en: 'Ask whether a single-name position is now portfolio risk. Hermes checks size, sector overlap, and known catalyst dates.' },
+        b: { sr: 'Pitajte da li pozicija sa jednim imenom sada predstavlja rizik portfolija. Platforma proverava veličinu, preklapanje sektora i poznate datume katalizatora.', en: 'Ask whether a single-name position is now portfolio risk. The platform checks size, sector overlap, and known catalyst dates.' },
       },
       {
         h: { sr: 'Veličina pozicije pod stvarnim ograničenjima', en: 'Position sizing under real constraints' },
@@ -93,7 +93,7 @@ export const t = {
         b: { sr: 'Uporedite simbole po likvidnosti, kvalitetu katalizatora i riziku pre otvaranja tržišta.', en: 'Compare symbols on liquidity, catalyst quality, and risk before the market opens.' },
       },
     ],
-    ctaBoxTitle: { sr: 'Pokrenite analizu i vidite kako radi stack ruta.', en: 'Run an analysis and watch the route stack work.' },
+    ctaBoxTitle: { sr: 'Pokrenite analizu i dobijte jasan tržišni brifing za sekunde.', en: 'Run an analysis and get a clear market brief in seconds.' },
     ctaBoxSub: { sr: 'Besplatno za početak. Bez kreditne kartice.', en: 'Free to start. No credit card required.' },
     disclaimer: {
       sr: 'CheggieTrade je informativni alat, ne investicioni savetnik. Ništa na ovoj platformi ne predstavlja finansijski savet. Uvek konsultujte licenciranog finansijskog savetnika pre donošenja investicionih odluka.',

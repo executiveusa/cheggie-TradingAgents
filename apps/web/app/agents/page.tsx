@@ -5,8 +5,8 @@ import { t, tr } from '@/lib/i18n'
 
 const AGENTS = [
   {
-    id: 'hermes',
-    name: 'Hermes',
+    id: 'market-analyst',
+    name: 'Market Analyst',
     role: { sr: 'Tržišni analitičar', en: 'Market Analyst' },
     description: {
       sr: 'Primarni agent za tržišne brifinge. Analizira koncentraciju, katalizatore i puteve zaštite.',
