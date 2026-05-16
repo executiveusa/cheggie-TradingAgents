@@ -5,7 +5,7 @@ const DEMO_BRIEF = {
   risk: 'HIGH',
   catalyst: 'Earnings catalyst is real but priced. The position size makes this an exposure event, not a trade thesis.',
   hedge: 'Size down to 15% before the print or buy put spread 30 days out.',
-  model_note: 'OpenRouter → NVIDIA free lane | demo mode',
+  model_note: 'AI analysis engine | demo mode',
   tokens: 1847,
   time_ms: 4200,
   mode: 'demo',

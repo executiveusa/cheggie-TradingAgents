@@ -23,8 +23,8 @@ const STEPS_SR = [
   },
   {
     num: '04',
-    title: 'Izaberite rutu modela',
-    body: 'Ostavite na "Auto" za automatski izbor, ili izaberite specifičnog provajdera — Grok za premium rezonovanje, Groq za brzinu.',
+    title: 'Pokrenite analizu',
+    body: 'Kliknite "Pokreni analizu". Platforma automatski bira najbrži dostupni analitički kanal na osnovu vašeg zahteva.',
   },
   {
     num: '05',
@@ -56,8 +56,8 @@ const STEPS_EN = [
   },
   {
     num: '04',
-    title: 'Select a model route',
-    body: 'Leave on "Auto" for automatic selection, or pick a specific provider — Grok for premium reasoning, Groq for speed.',
+    title: 'Run the analysis',
+    body: 'Click "Run Analysis". The platform automatically selects the fastest available analysis channel based on your request.',
   },
   {
     num: '05',

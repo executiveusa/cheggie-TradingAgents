@@ -18,9 +18,8 @@ export default function Nav() {
     { href: '/analyze', label: tr(t.nav.analyze, lang) },
     { href: '/reports', label: tr(t.nav.reports, lang) },
     { href: '/watchlist', label: tr(t.nav.watchlist, lang) },
-    { href: '/models', label: tr(t.nav.models, lang) },
+    { href: '/assistant', label: tr(t.nav.assistant, lang) },
     { href: '/onboarding', label: tr(t.nav.onboarding, lang) },
-    { href: '/pricing', label: lang === 'sr' ? 'Cene' : 'Pricing' },
   ]
 
   return (

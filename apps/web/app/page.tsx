@@ -62,16 +62,10 @@ export default function Home() {
                 {tr(t.home.ctaPrimary, lang)}
               </Link>
               <Link
-                href="/demo"
+                href="/#how-it-works"
                 className="rounded-xl border border-[var(--border)] px-6 py-3 font-semibold text-[var(--text)] hover:border-[var(--accent)] transition-colors"
               >
                 {tr(t.home.ctaSecondary, lang)}
-              </Link>
-              <Link
-                href="/method"
-                className="px-6 py-3 text-[var(--muted)] hover:text-[var(--text)] underline-offset-4 hover:underline transition-colors"
-              >
-                {tr(t.home.ctaTertiary, lang)}
               </Link>
             </motion.div>
 
@@ -100,28 +94,28 @@ export default function Home() {
             </p>
             <p className="text-2xl font-bold text-[var(--text)] mb-8 leading-snug">
               {lang === 'sr'
-                ? 'Hermes meri koncentraciju, likvidnost, rizik katalizatora i puteve zaštite pre nego što ikada zvuči sigurno.'
-                : 'Hermes weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain.'}
+                ? 'AI tim analizira koncentraciju, likvidnost, rizik katalizatora i puteve zaštite pre nego što ikada zvuči sigurno.'
+                : 'Your AI team weighs concentration, liquidity, catalyst risk, and hedge paths before it ever sounds certain.'}
             </p>
 
             {[
               {
-                title: lang === 'sr' ? 'Grok prvi kada je konfigurisan' : 'Grok first when configured',
+                title: lang === 'sr' ? 'Analitičar tržišta' : 'Market Analyst',
                 body: lang === 'sr'
-                  ? 'Desk može da rutira kroz xAI i ponovo koristi stabilni session id za bolje ponašanje keširanje prompta.'
-                  : 'The desk can route through xAI and reuse a stable session id for better prompt-cache behavior.',
+                  ? 'Procenjuje fundamentalnu vrednost, tehničke nivoe i tržišnu strukturu za svaki ticker.'
+                  : 'Assesses fundamental value, technical levels, and market structure for every ticker.',
               },
               {
-                title: lang === 'sr' ? 'Groq za brzinu' : 'Groq for speed',
+                title: lang === 'sr' ? 'Istraživač rizika' : 'Risk Researcher',
                 body: lang === 'sr'
-                  ? 'Groq ostaje u lancu za brzo rezonovanje kada je dostupan kompatibilan ključ.'
-                  : 'Groq stays in the chain for fast reasoning when a compatible key is available.',
+                  ? 'Proverava koncentraciju portfolija, veličinu pozicije i katalizatorske datume pre svake odluke.'
+                  : 'Checks portfolio concentration, position sizing, and catalyst dates before every decision.',
               },
               {
-                title: lang === 'sr' ? 'OpenRouter zakačen za besplatnu NVIDIA liniju' : 'OpenRouter pinned to a free NVIDIA lane',
+                title: lang === 'sr' ? 'Menadžer rizika' : 'Risk Manager',
                 body: lang === 'sr'
-                  ? 'Podrazumevani OpenRouter model je poznata NVIDIA besplatna ruta.'
-                  : 'The default OpenRouter model is a known NVIDIA free route for actual final-answer text.',
+                  ? 'Verifikuje sve zaključke i daje konačno mišljenje sa jasnim preporukom za zaštitu.'
+                  : 'Verifies all conclusions and gives the final verdict with a clear hedge recommendation.',
               },
             ].map((f) => (
               <div key={f.title} className="border-l-2 border-[var(--accent)] pl-4 mb-5">
@@ -171,7 +165,7 @@ export default function Home() {
       </section>
 
       {/* SOLUTION / STEPS */}
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section id="how-it-works" className="mx-auto max-w-7xl px-6 py-20">
         <div className="grid lg:grid-cols-[2fr_3fr] gap-16">
           <div className="lg:sticky lg:top-32 h-fit">
             <p className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase mb-4">

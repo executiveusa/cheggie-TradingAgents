@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 
-export default function HermesPage() {
-  redirect('/analyze')
+// Legacy route — redirect to the assistant page
+export default function LegacyRedirectPage() {
+  redirect('/assistant')
 }

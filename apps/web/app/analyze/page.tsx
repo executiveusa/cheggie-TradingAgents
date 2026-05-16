@@ -23,11 +23,6 @@ interface Brief {
   timestamp: string
 }
 
-const ROUTES: RoutePreference[] = ['auto', 'gateway', 'grok', 'groq', 'openrouter', 'gemini']
-const ROUTE_LABELS: Record<RoutePreference, string> = {
-  auto: 'Auto', gateway: 'Gateway', grok: 'Grok', groq: 'Groq', openrouter: 'OpenRouter', gemini: 'Gemini',
-}
-
 function AnalyzeForm() {
   const { lang } = useLanguage()
   const searchParams = useSearchParams()
@@ -37,7 +32,7 @@ function AnalyzeForm() {
   const [size, setSize] = useState('')
   const [catalyst, setCatalyst] = useState<CatalystType>('earnings')
   const [downside, setDownside] = useState('')
-  const [route, setRoute] = useState<RoutePreference>('auto')
+  const route: RoutePreference = 'auto'
   const [loading, setLoading] = useState(false)
   const [brief, setBrief] = useState<Brief | null>(null)
   const [followUp, setFollowUp] = useState('')
@@ -184,28 +179,6 @@ function AnalyzeForm() {
           >
             {loading ? tr(t.analyze.running, lang) : tr(t.analyze.runBrief, lang)}
           </button>
-
-          {/* Route */}
-          <div className="mt-7">
-            <p className="font-mono text-xs text-[var(--accent)] tracking-[0.18em] uppercase mb-3">
-              {tr(t.analyze.route, lang)}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {ROUTES.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRoute(r)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                    route === r
-                      ? 'bg-[var(--accent)] text-black'
-                      : 'border border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] hover:border-[var(--accent)]'
-                  }`}
-                >
-                  {ROUTE_LABELS[r]}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Audit */}
           <div className="mt-7">
