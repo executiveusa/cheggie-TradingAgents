@@ -33,8 +33,8 @@ export default function StatusPage() {
       .then(d => {
         setStatus(prev => ({
           ...prev,
-          api: d.mode === 'demo' ? 'offline' : 'online',
-          demo_mode: d.mode === 'demo',
+          api: (d.mode === 'demo' || d.mode === 'demo-fallback') ? 'offline' : 'online',
+          demo_mode: d.mode === 'demo' || d.mode === 'demo-fallback',
         }))
       })
       .catch(() => setStatus(prev => ({ ...prev, api: 'offline' })))
